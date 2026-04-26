@@ -99,14 +99,24 @@ body {
   outline: none;
 }
 
-.mapbox-logo {
-  display: none;
+.mapboxgl-ctrl-logo {
+  display: none !important;
 }
 
-/* prevent overlay between title and search bar */
-.mapboxgl-ctrl-top-right {
+/* prevent overlay between title and map controls */
+.mapboxgl-ctrl-top-right,
+.mapboxgl-ctrl-bottom-left {
   z-index: 20;
   mix-blend-mode: difference;
+}
+
+.mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-group {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.mapboxgl-ctrl-bottom-left .mapboxgl-ctrl:not(.mapboxgl-ctrl-group) {
+  margin: 0;
 }
 
 .mapboxgl-ctrl-group {
@@ -204,10 +214,6 @@ svg.mapboxgl-ctrl-geocoder--icon {
 .mapboxgl-ctrl-geocoder--input {
   height: 28px;
   padding: 6px 28px;
-}
-
-.mapboxgl-ctrl-bottom-left {
-  display: none;
 }
 
 .mapboxgl-ctrl-top-right .mapboxgl-ctrl {

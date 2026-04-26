@@ -1,5 +1,4 @@
 import Homepage from '@/components/Homepage';
-import { Instagram } from '@/components/Instagram';
 import { ROOT_PATH } from '@/paths';
 
 export default function Home() {
@@ -10,8 +9,6 @@ export default function Home() {
       </h1>
 
       <Homepage />
-
-      <Instagram />
     </main>
   );
 }

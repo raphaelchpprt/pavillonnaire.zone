@@ -62,7 +62,7 @@ export function useMapBox() {
     // Navigation control (zoom buttons)
     map.addControl(
       new mapboxgl.NavigationControl({ showZoom: false }),
-      'top-right'
+      'bottom-left'
     );
 
     // Search
