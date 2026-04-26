@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom';
 import mapboxgl, { MapboxGeoJSONFeature, Marker } from 'mapbox-gl';
 import { Tooltip } from '@/components/Tooltip';
 import { LAYER_IDS, LayerType } from '@/constants/layers';
+import { ActiveFilters } from '@/types/entry';
 
 const INITIAL_LONGITUDE = 1.872;
 const INITIAL_LATITUDE = 46.62;
@@ -21,7 +22,43 @@ const getEffectiveVisibleLayers = (selection: Set<LayerType>) => {
   return selection;
 };
 
-export function useMapBox() {
+function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
+  const conditions: unknown[][] = [];
+
+  if (activeFilters.date.length > 0) {
+    conditions.push([
+      'any',
+      ...activeFilters.date.map((d) => ['==', ['to-string', ['get', 'year']], d]),
+    ]);
+  }
+  if (activeFilters.type.length > 0) {
+    conditions.push([
+      'any',
+      ...activeFilters.type.map((t) => ['==', ['get', 'type'], t]),
+    ]);
+  }
+  if (activeFilters.place.length > 0) {
+    conditions.push([
+      'any',
+      ...activeFilters.place.map((p) => ['==', ['get', 'place'], p]),
+    ]);
+  }
+  if (activeFilters.author.length > 0) {
+    conditions.push([
+      'any',
+      ...activeFilters.author.flatMap((a) => [
+        ['==', ['get', 'author'], a],
+        ['==', ['get', 'director'], a],
+        ['==', ['get', 'artist'], a],
+        ['==', ['get', 'editor'], a],
+      ]),
+    ]);
+  }
+
+  return conditions.length > 0 ? ['all', ...conditions] : null;
+}
+
+export function useMapBox(activeFilters: ActiveFilters) {
   const [feature, setFeature] = useState<MapboxGeoJSONFeature | undefined>();
   const [selectedLayers, setSelectedLayers] = useState<Set<LayerType>>(
     new Set()
@@ -59,7 +96,6 @@ export function useMapBox() {
       marker: { color: '#000' } as unknown as Marker,
     });
 
-    // Navigation control (zoom buttons)
     map.addControl(
       new mapboxgl.NavigationControl({ showZoom: false }),
       'bottom-left'
@@ -97,14 +133,12 @@ export function useMapBox() {
 
       map.getCanvas().style.cursor = 'pointer';
 
-      // Create tooltip node
       const tooltipNode = document.createElement('div');
 
       // TODO: replace deprecated ReactDOM.render below by createRoot.
       // eslint-disable-next-line react/no-deprecated
       ReactDOM.render(<Tooltip feature={feature} />, tooltipNode);
 
-      // Set tooltip on map
       tooltipRef.current
         .setLngLat(event.lngLat)
         .setDOMContent(tooltipNode)
@@ -135,6 +169,19 @@ export function useMapBox() {
     // Clean up on unmount
     return () => map.remove();
   }, [isLaptop]);
+
+  useEffect(() => {
+    if (!mapRef.current || !isMapLoaded) return;
+
+    const filter = buildLayerFilter(activeFilters);
+
+    LAYER_IDS.forEach((id) => {
+      if (mapRef.current?.getLayer(id)) {
+        const map = mapRef.current;
+        map.setFilter(id, filter as Parameters<typeof map.setFilter>[1]);
+      }
+    });
+  }, [activeFilters, isMapLoaded]);
 
   const toggleLayer = (layerId: LayerType) => {
     setSelectedLayers((prev) => {

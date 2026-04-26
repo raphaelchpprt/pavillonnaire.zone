@@ -1,7 +1,7 @@
 # Plan — Feature Index (filtres + grille)
 
 > Document de travail conservé entre sessions. Source de vérité du plan d'implémentation de la feature "Index" sur pavillonnaire.zone.
-> Dernière mise à jour : 2026-04-26.
+> Dernière mise à jour : 2026-04-26 — relecture maquettes PDF, corrections UX section 2.2 et 2.4.
 
 ---
 
@@ -33,12 +33,15 @@ Le bouton Instagram est déplacé **dans la modale About**, au même endroit vis
 - Déclenché par le bouton `i` haut-droite
 - Largeur calée sur la searchbar Mapbox dépliée (≈ 360 px max)
 - Fond blanc opaque
-- Header : titre `index` (Redaction 20 bold) + croix de fermeture
+- **Header** (une seule ligne, flex row) :
+  - Titre `filtres` (Redaction 20 bold) à gauche
+  - Croix de fermeture à droite
+- **Sous le header** : interrupteur `Carte ↔ Grille` (2ème ligne du panneau, juste sous le header)
+  - Mode actif en gras, inactif en regular
 - 4 sections collapsibles : `Date`, `Auteur.ices`, `Lieu`, `Type`
-  - Titres en **gras**, valeurs dépliées en **regular** (Redaction 20)
-  - Au clic sur une valeur : la valeur passe en **pill blanc-sur-noir** + petite croix à droite (retire le filtre)
+  - Titres en **gras** + flèche ↓/↑, valeurs dépliées en **regular** (Redaction 20)
+  - Au clic sur une valeur : pill **blanc sur fond noir** + petite croix `×` à droite (retire le filtre)
   - Multi-sélection autorisée
-- Footer : interrupteur `Carte ↔ Grille` (mode actif en gras)
 
 ### 2.3 Logique de filtrage
 
@@ -49,20 +52,32 @@ Le bouton Instagram est déplacé **dans la modale About**, au même endroit vis
 
 ### 2.4 Vue Grille
 
-- Mosaïque de toutes les Entrées (filtrées)
-- Images à leurs **formats natifs**, alignées par le bas, marges égales gauche/droite
-- Titre sous chaque image (Redaction 20)
-- Logo catégorie sous le titre
-- **Comportement couleur** :
-  - Repos : `grayscale(1)` (noir et blanc)
-  - Hover : `grayscale(0)` (couleur)
-  - Clic : couleur figée persistante (état "épinglé")
-  - Idem pour le logo catégorie
-- **Variante optionnelle à tester** : filtre type pixel (`image-rendering: pixelated`)
-- **Scroll** : titre `pavillonnaire.zone` en `mix-blend-difference` mange les images sous lui (déjà existant en haut)
+**Organisation** :
+- **Une carte par entrée** (mosaïque, pas par série)
+- Images à leurs **formats natifs**, **alignées par le bas** (`align-items: flex-end`)
+- **Titre** sous chaque image (Redaction 20 regular)
+- **Logo catégorie** sous le titre
+- Images centrées dans la page, même marge gauche et droite
+- Scrollable verticalement (scrollbar fine sur le côté)
+
+**Format images** :
+- Formats natifs — pas de crop, pas de carré uniforme
+- `align-items: flex-end` sur le conteneur flex-wrap → les images courtes s'alignent en bas, les hautes montent
+- **N&B par défaut** (`grayscale(1)`), couleur au hover (`grayscale(0)`), couleur figée au clic (pin persistant `Set<id>`)
+- **Variante optionnelle** : `image-rendering: pixelated` (filtre pixel)
+- Même comportement N&B/couleur sur le logo catégorie
+
+**Panneau filtres en mode Grille** :
+- Le panneau `filtres` reste visible à droite, identique à la vue Carte
+- La légende catégories à gauche reste affichée et filtrante
+
+**Scroll** :
+- Titre `pavillonnaire.zone` en `mix-blend-difference` passe naturellement par-dessus les images au scroll
 - Scrollbar fine sur le côté
-- Légende catégories à gauche conservée et toujours filtrante
-- Clic sur une tuile → ouvre `DetailsModal` en overlay (idem clic sur marker map)
+
+**Clic sur une carte** :
+- Ouvre la `DetailsModal` en overlay (1/4 largeur droite), identique à la map
+- Croix pour fermer et revenir à la grille
 
 ### 2.5 Modale détail (DetailsModal)
 
@@ -132,7 +147,7 @@ Le bouton Instagram est déplacé **dans la modale About**, au même endroit vis
 | D2  | Logique multi-valeurs intra-champ                 | OR                                                                                                                      |
 | D3  | Logique inter-champs                              | AND                                                                                                                     |
 | D4  | Persistance d'état                                | URL params (cohérent avec About qui utilise déjà `?view=`)                                                              |
-| D5  | Titre du panneau                                  | `index`                                                                                                                 |
+| D5  | Titre du panneau                                  | `filtres` (maquette confirmée — décision 2026-04-26)                                                                   |
 | D6  | Icône bouton coin haut-droite                     | `i` typographique (Redaction), à valider visuellement (vs SVG dédié)                                                    |
 | D7  | Stratégie de livraison                            | **Phasée** (4 phases mergeable indépendamment)                                                                          |
 | D8  | Largeur modale détail                             | 25 % (au lieu de 33 %), min 350 px                                                                                      |
@@ -142,17 +157,31 @@ Le bouton Instagram est déplacé **dans la modale About**, au même endroit vis
 
 ### Variables d'env à configurer (Phase 2)
 
-À ajouter dans `.env.local` (à fournir par l'utilisateur) :
+Configuré dans `.env.local` le 2026-04-26 :
 
 ```
-MAPBOX_SECRET_TOKEN=sk.xxx           # token secret Mapbox (scope datasets:read)
-MAPBOX_USER=<user_handle>            # username Mapbox
-MAPBOX_DATASET_IDS=ville,initiative,audiovisuel,photographie,edition,musique
-# OU
-MAPBOX_DATASET_IDS=<csv des dataset_id réels si différents des handles>
+MAPBOX_SECRET_TOKEN=sk.xxx           # token secret Mapbox (voir scope ci-dessous)
+MAPBOX_USER=sabrimyllaud
+MAPBOX_DATASET_IDS=<csv de 6 dataset_id réels>
+# Ordre: edition,musique,photographie,audiovisuel,ville,initiative
+# Mapping ID ↔ catégorie à matérialiser dans src/constants/datasets.ts en Phase 2.1
 ```
 
-Note : le token doit être **secret (sk.)**, pas le public token (pk.) déjà utilisé pour le rendu Mapbox client. Scope nécessaire : `datasets:read`.
+**Note importante sur les scopes Mapbox** : `DATASETS:READ` est un scope **public** (déjà accordé à tout token de l'owner, y compris le `pk.` existant). Pour générer un vrai token **secret (`sk.`)** il faut cocher au moins un scope secret. Le minimum utile ici est **`DATASETS:LIST`** (permet aussi le sanity-check `GET /datasets/v1/{user}`). On garde le `sk.` côté serveur pour le principe de séparation client/serveur, même si techniquement le `pk.` aurait fonctionné — défense en profondeur si on restreint un jour le `pk.` par URL.
+
+**Inventaire datasets (Phase 2.3, snapshot 2026-04-26)** :
+
+| Catégorie    | Dataset name   | Dataset ID                 | # features |
+| ------------ | -------------- | -------------------------- | ---------- |
+| Edition      | `edition`      | `ckv6rxyld5hre20phzrg56r3w` | 13         |
+| Audio        | `musique`      | `ckx08odti3jzv28k3qtc13k38` | 7          |
+| Image        | `photographie` | `ckz5f9z090p4w20qf0uk7h5h5` | 17         |
+| Cinéma       | `audiovisuel`  | `ckx0j58950nx427nvvqkimwbg` | 8          |
+| Architecture | `ville`        | `ckzfucuoa1ec728r0twbxwa8z` | 14         |
+| Initiative   | `initiative`   | `cl9haqkad219h22tmwyzye55t` | 9          |
+| **Total**    |                |                            | **68**     |
+
+→ **68 features total**, tous datasets sous le seuil 100/requête → **pas de pagination nécessaire** en Phase 2.1 (mais garder le code de pagination prêt pour le futur).
 
 ---
 
@@ -383,27 +412,28 @@ Convention `<type>: <message>` (semantic) — observée dans `git log` :
 
 **Objectif** : alternative à la map en grille d'images, mêmes filtres, ouvre la modale en overlay.
 
-| #   | Action                                                                                                                                                   | Fichier(s)                                 |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| 3.1 | Toggle `Carte ↔ Grille` dans `FilterPanel` câblé sur `?view=map\|grid` (défaut `map`)                                                                   | `src/components/FilterPanel.tsx`           |
-| 3.2 | Composant `EntriesGrid.tsx` : reçoit les Entrées filtrées                                                                                                | `src/components/EntriesGrid.tsx` (nouveau) |
-| 3.3 | Layout : flex-wrap avec `align-items: end`, formats natifs préservés, marges égales gauche/droite, titre Redaction 20 + logo catégorie sous chaque image | idem                                       |
-| 3.4 | Image `loading="lazy"`, `decoding="async"`, `alt={entry.title}`                                                                                          | idem                                       |
-| 3.5 | Comportement N&B → couleur : repos `grayscale(1)`, hover `grayscale(0)` (transition CSS), clic = pin persistant (`Set<id>` dans state local)             | idem                                       |
-| 3.6 | Idem N&B → couleur sur logo catégorie sous image                                                                                                         | idem                                       |
-| 3.7 | Scroll : laisser le titre `pavillonnaire.zone` en `mix-blend-difference` faire son effet ; ajuster scrollbar custom thin via CSS si besoin               | `src/styles/global.css`                    |
-| 3.8 | Légende gauche `LegendFilter` reste affichée et active sur la grille                                                                                     | `src/components/Homepage.tsx`              |
-| 3.9 | Clic tuile → `setSelectedFeature` → `DetailsModal` s'ouvre en overlay (réutilise l'existant)                                                             | idem                                       |
+| #   | Action                                                                                                                                                                                                                  | Fichier(s)                                 |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| 3.0 | Renommer titre panneau `"index"` → `"filtres"` dans `FilterPanel.tsx` ; déplacer `Carte ↔ Grille` du footer vers la 2ème ligne du header ; câbler sur `?view=map\|grid`                                                  | `src/components/FilterPanel.tsx`           |
+| 3.1 | Composant `EntriesGrid.tsx` : reçoit les Entrées filtrées                                                                                                                                                               | `src/components/EntriesGrid.tsx` (nouveau) |
+| 3.2 | Layout : `flex flex-wrap items-end`, une carte par entrée, formats natifs, marges égales gauche/droite. Titre (Redaction 20) + logo catégorie sous l'image                                                               | idem                                       |
+| 3.3 | Image `loading="lazy"`, `decoding="async"`, `alt={entry.title}`                                                                                                                                                         | idem                                       |
+| 3.4 | N&B → couleur : repos `grayscale(1)`, hover `grayscale(0)` (transition CSS), clic = pin persistant (`Set<id>` dans state local)                                                                                         | idem                                       |
+| 3.5 | Logo catégorie sous le titre : même comportement N&B → couleur                                                                                                                                                          | idem                                       |
+| 3.6 | Scroll : titre `pavillonnaire.zone` en `mix-blend-difference` passe par-dessus les images ; scrollbar fine via CSS                                                                                                       | `src/styles/global.css`                    |
+| 3.7 | Légende gauche `LegendFilter` reste affichée et filtrante en mode Grille                                                                                                                                                 | `src/components/Homepage.tsx`              |
+| 3.8 | Clic carte → ouvre `DetailsModal` en overlay 1/4 largeur (réutilise l'existant)                                                                                                                                          | idem                                       |
 
 **Critères d'acceptation Phase 3**
 
+- [ ] Titre du panneau est `filtres` ; `Carte ↔ Grille` est sous le titre (pas en footer), mode actif en gras
 - [ ] Le toggle bascule entre map et grille sans perte d'état (filtres + entrée sélectionnée)
-- [ ] La grille respecte les filtres actifs et la légende catégories
-- [ ] Les images sont N&B, deviennent couleur au hover, restent couleur au clic
-- [ ] Les logos catégorie sous les images suivent la même logique
-- [ ] Cliquer une tuile ouvre la modale détail par-dessus la grille
-- [ ] Le scroll fait passer le titre `pavillonnaire.zone` par-dessus les images en négatif
-- [ ] **Conventions** : `'use client'`, `FC<EntriesGridProps>`, `cn()` pour les classes hover/pin, `aria-label` sur les tuiles
+- [ ] La grille affiche une carte par entrée, formats natifs, alignées par le bas (`align-items: flex-end`), titre sous l'image
+- [ ] Les filtres actifs et la légende catégories filtrent la grille
+- [ ] Les images sont N&B, deviennent couleur au hover, restent couleur au clic ; idem logo catégorie
+- [ ] Cliquer une carte ouvre la modale détail en overlay par-dessus la grille
+- [ ] Le scroll fait passer le titre `pavillonnaire.zone` par-dessus les images
+- [ ] **Conventions** : `'use client'`, `FC<EntriesGridProps>`, `cn()` pour les classes hover/pin, `aria-label` sur les cartes
 
 ---
 
@@ -468,7 +498,7 @@ Convention `<type>: <message>` (semantic) — observée dans `git log` :
 - [ ] **Phase 2** — Données + filtres actifs
   - [ ] 2.1 Route `/api/entries`
   - [ ] 2.2 Fallback gracieux
-  - [ ] 2.3 Env vars
+  - [x] 2.3 Env vars ✅ 2026-04-26
   - [ ] 2.4 Type `Entry`
   - [ ] 2.5 Hook `useEntries`
   - [ ] 2.6 Calcul facettes
