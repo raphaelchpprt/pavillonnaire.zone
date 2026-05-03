@@ -1,7 +1,7 @@
 # Plan — Feature Index (filtres + grille)
 
 > Document de travail conservé entre sessions. Source de vérité du plan d'implémentation de la feature "Index" sur pavillonnaire.zone.
-> Dernière mise à jour : 2026-04-26 — relecture maquettes PDF, corrections UX section 2.2 et 2.4.
+> Dernière mise à jour : 2026-05-03 — Phase 2 ✅ + Phase 3 ✅ complètes.
 
 ---
 
@@ -426,14 +426,14 @@ Convention `<type>: <message>` (semantic) — observée dans `git log` :
 
 **Critères d'acceptation Phase 3**
 
-- [ ] Titre du panneau est `filtres` ; `Carte ↔ Grille` est sous le titre (pas en footer), mode actif en gras
-- [ ] Le toggle bascule entre map et grille sans perte d'état (filtres + entrée sélectionnée)
-- [ ] La grille affiche une carte par entrée, formats natifs, alignées par le bas (`align-items: flex-end`), titre sous l'image
-- [ ] Les filtres actifs et la légende catégories filtrent la grille
-- [ ] Les images sont N&B, deviennent couleur au hover, restent couleur au clic ; idem logo catégorie
-- [ ] Cliquer une carte ouvre la modale détail en overlay par-dessus la grille
-- [ ] Le scroll fait passer le titre `pavillonnaire.zone` par-dessus les images
-- [ ] **Conventions** : `'use client'`, `FC<EntriesGridProps>`, `cn()` pour les classes hover/pin, `aria-label` sur les cartes
+- [x] Titre du panneau est `filtres` ; `Carte ↔ Grille` est sous le titre (pas en footer), mode actif en gras
+- [x] Le toggle bascule entre map et grille sans perte d'état (filtres + entrée sélectionnée)
+- [x] La grille affiche une carte par entrée, formats natifs, alignées par le bas (`align-items: flex-end`), titre sous l'image
+- [x] Les filtres actifs et la légende catégories filtrent la grille
+- [x] Les images sont N&B, deviennent couleur au hover, restent couleur au clic ; idem logo catégorie
+- [x] Cliquer une carte ouvre la modale détail en overlay par-dessus la grille
+- [x] Le scroll fait passer le titre `pavillonnaire.zone` par-dessus les images
+- [x] **Conventions** : `'use client'`, `FC<EntriesGridProps>`, `cn()` pour les classes hover/pin, `aria-label` sur les cartes
 
 ---
 
@@ -495,27 +495,27 @@ Convention `<type>: <message>` (semantic) — observée dans `git log` :
   - [x] 1.4 FilterPanel shell
   - [x] 1.5 URL param `index`
   - [x] 1.6 Modale 25 %
-- [ ] **Phase 2** — Données + filtres actifs
-  - [ ] 2.1 Route `/api/entries`
-  - [ ] 2.2 Fallback gracieux
-  - [x] 2.3 Env vars ✅ 2026-04-26
-  - [ ] 2.4 Type `Entry`
-  - [ ] 2.5 Hook `useEntries`
-  - [ ] 2.6 Calcul facettes
-  - [ ] 2.7 FilterPanel câblé
-  - [ ] 2.8 Application Mapbox `setFilter`
-  - [ ] 2.9 Persistance URL
-  - [ ] 2.10 Levée d'état
-- [ ] **Phase 3** — Vue Grille
-  - [ ] 3.1 Toggle `?view=`
-  - [ ] 3.2 EntriesGrid
-  - [ ] 3.3 Layout
-  - [ ] 3.4 Lazy load
-  - [ ] 3.5 N&B → couleur
-  - [ ] 3.6 Logos catégorie
-  - [ ] 3.7 Scroll + scrollbar
-  - [ ] 3.8 LegendFilter actif
-  - [ ] 3.9 Modale en overlay
+- [x] **Phase 2** — Données + filtres actifs ✅ 2026-04-26
+  - [x] 2.1 Route `/api/entries` (ISR 1h, pagination, `Promise.allSettled`)
+  - [x] 2.2 Fallback gracieux (`Promise.allSettled` + `console.error` par dataset)
+  - [x] 2.3 Env vars
+  - [x] 2.4 Type `Entry` + `FilterField` + `ActiveFilters` + `Facets` + `ViewMode`
+  - [x] 2.5 Hook `useEntries` (fetch natif, cleanup `cancelled`)
+  - [x] 2.6 Calcul facettes (`computeFacets` dans `lib/facets.ts`)
+  - [x] 2.7 FilterPanel câblé (pills actives, `aria-pressed`, multi-sélection)
+  - [x] 2.8 Application Mapbox `setFilter` (OR intra-champ, AND inter-champs)
+  - [x] 2.9 Persistance URL (`parseFiltersFromUrl` / `buildFilterUrl`)
+  - [x] 2.10 Levée d'état dans `Homepage` (props vers `FilterPanel` + `useMapBox`)
+- [ ] **Phase 3** — Vue Grille (en cours)
+  - [x] 3.0 FilterPanel : titre `filtres` + `Carte ↔ Grille` sous le header + câblage `?view=`
+  - [x] 3.1 `EntriesGrid.tsx` créé, reçoit les entrées filtrées côté client
+  - [x] 3.2 Layout `flex flex-wrap items-end`, formats natifs, titre + logo sous l'image
+  - [x] 3.3 `loading="lazy"`, `decoding="async"`, `alt={entry.title}`
+  - [x] 3.4 N&B → couleur : `grayscale` au repos, `hover:grayscale-0`, pin `Set<id>` au clic
+  - [x] 3.5 Logo catégorie : même filtre `grayscale` (appliqué sur la carte entière)
+  - [ ] 3.6 Scroll + scrollbar : à vérifier (le titre passe par-dessus grâce à `mix-blend-difference` et `z-10`)
+  - [ ] 3.7 `LegendFilter` actif en mode Grille (actuellement caché avec le conteneur map)
+  - [ ] 3.8 Clic carte → `DetailsModal` en overlay (nécessite bridge `Entry` → `MapboxGeoJSONFeature`)
 - [ ] **Phase 4** — Polish
   - [ ] 4.1 Variante pixel
   - [ ] 4.2 Animation slide-in

@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import mapboxgl, { MapboxGeoJSONFeature, Marker } from 'mapbox-gl';
 import { Tooltip } from '@/components/Tooltip';
 import { LAYER_IDS, LayerType } from '@/constants/layers';
-import { ActiveFilters } from '@/types/entry';
+import { AUTHOR_FIELDS, ActiveFilters } from '@/types/entry';
 
 const INITIAL_LONGITUDE = 1.872;
 const INITIAL_LATITUDE = 46.62;
@@ -46,12 +46,9 @@ function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
   if (activeFilters.author.length > 0) {
     conditions.push([
       'any',
-      ...activeFilters.author.flatMap((a) => [
-        ['==', ['get', 'author'], a],
-        ['==', ['get', 'director'], a],
-        ['==', ['get', 'artist'], a],
-        ['==', ['get', 'editor'], a],
-      ]),
+      ...activeFilters.author.flatMap((a) =>
+        AUTHOR_FIELDS.map((f) => ['==', ['get', f], a]),
+      ),
     ]);
   }
 

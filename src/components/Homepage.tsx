@@ -2,7 +2,7 @@
 
 import { About } from '@/components/About';
 import { Instagram } from '@/components/Instagram';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -15,8 +15,10 @@ import { IndexButton } from '@/components/IndexButton';
 import { FilterPanel } from '@/components/FilterPanel';
 import { EntriesGrid } from '@/components/EntriesGrid';
 import { computeFacets } from '@/lib/facets';
-import { parseFiltersFromUrl, buildFilterUrl } from '@/lib/filtersUrl';
-import { FilterField, ViewMode } from '@/types/entry';
+import { parseFiltersFromUrl, buildFilterUrl, buildViewUrl } from '@/lib/filtersUrl';
+import { Entry, FilterField, ViewMode } from '@/types/entry';
+import { LayerType } from '@/constants/layers';
+import { MapboxGeoJSONFeature } from 'mapbox-gl';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 export default function Homepage() {
@@ -32,20 +34,53 @@ export default function Homepage() {
     [searchParams],
   );
 
+  const { mapContainerRef, feature, toggleLayer, selectedLayers, isMapLoaded } =
+    useMapBox(activeFilters);
+
   const { entries } = useEntries();
   const facets = useMemo(() => computeFacets(entries), [entries]);
 
   const filteredEntries = useMemo(() => {
     const { date, author, place, type } = activeFilters;
-    if (!date.length && !author.length && !place.length && !type.length) return entries;
+    const hasCategoryFilter = selectedLayers.size > 0;
+    const hasFieldFilter = date.length || author.length || place.length || type.length;
+    if (!hasCategoryFilter && !hasFieldFilter) return entries;
     return entries.filter((entry) => {
+      if (hasCategoryFilter && !selectedLayers.has(entry.category as LayerType)) return false;
       if (date.length && !date.includes(String(entry.year ?? ''))) return false;
       if (type.length && !type.includes(entry.type ?? '')) return false;
       if (place.length && !place.includes(entry.place ?? '')) return false;
       if (author.length && !entry.authors.some((a) => author.includes(a))) return false;
       return true;
     });
-  }, [entries, activeFilters]);
+  }, [entries, activeFilters, selectedLayers]);
+
+  const [gridSelectedEntry, setGridSelectedEntry] = useState<Entry | undefined>();
+
+  const gridFeature = useMemo((): MapboxGeoJSONFeature | undefined => {
+    if (!gridSelectedEntry) return undefined;
+    const e = gridSelectedEntry;
+    return {
+      type: 'Feature',
+      id: e.id,
+      geometry: { type: 'Point', coordinates: [0, 0] },
+      properties: {
+        title: e.title,
+        type: e.type ?? null,
+        author: e.authors.join(', ') || null,
+        year: e.year ?? null,
+        place: e.place ?? null,
+        image: e.image ?? null,
+        images: e.images ? JSON.stringify(e.images) : null,
+        abstract: e.abstract ?? null,
+        link: e.link ?? null,
+      },
+      layer: {} as mapboxgl.Layer,
+      source: '',
+      sourceLayer: '',
+      state: {},
+    } as unknown as MapboxGeoJSONFeature;
+  }, [gridSelectedEntry]);
 
   const toggleFilter = (field: FilterField, value: string) => {
     const current = activeFilters[field];
@@ -56,25 +91,16 @@ export default function Homepage() {
   };
 
   const handleViewChange = (v: ViewMode) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (v === 'grid') {
-      params.set('view', 'grid');
-    } else {
-      params.delete('view');
-    }
-    const qs = params.toString();
-    router.push(qs ? `/?${qs}` : '/');
+    router.push(buildViewUrl(v, searchParams));
   };
 
   useEffect(() => {
+    if (!isAboutOpen) return;
     function hideAbout(e: KeyboardEvent) {
-      if (isAboutOpen && e.key === 'Escape') router.push(ROOT_PATH);
+      if (e.key === 'Escape') router.push(ROOT_PATH);
     }
-
     document.body.addEventListener('keydown', hideAbout);
-    return () => {
-      document.body.removeEventListener('keydown', hideAbout);
-    };
+    return () => document.body.removeEventListener('keydown', hideAbout);
   }, [router, isAboutOpen]);
 
   useEffect(() => {
@@ -88,9 +114,6 @@ export default function Homepage() {
       document.body.removeEventListener('keydown', hideDetailsModal);
     };
   }, []);
-
-  const { mapContainerRef, feature, toggleLayer, selectedLayers, isMapLoaded } =
-    useMapBox(activeFilters);
 
   return (
     <>
@@ -130,24 +153,31 @@ export default function Homepage() {
           isGridView && 'hidden',
         )}
         ref={mapContainerRef}
+      />
+
+      <div
+        className={cn(
+          'absolute inset-y-0 left-0 z-20 transition-opacity duration-300 ease-in-out',
+          isMapLoaded || isGridView ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}
       >
-        <div
-          className={cn(
-            'transition-opacity duration-300 ease-in-out',
-            isMapLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none',
-          )}
-        >
-          <LegendFilter
-            selectedLayers={selectedLayers}
-            onFilterChange={toggleLayer}
-          />
-        </div>
-        <DetailsModal feature={feature} />
+        <LegendFilter
+          selectedLayers={selectedLayers}
+          onFilterChange={toggleLayer}
+        />
       </div>
+
+      <DetailsModal feature={isGridView ? gridFeature : feature} />
 
       {isGridView && (
         <div className="absolute inset-0 z-10 bg-white">
-          <EntriesGrid entries={filteredEntries} />
+          <EntriesGrid
+            entries={filteredEntries}
+            onSelect={(entry) => {
+              setGridSelectedEntry(entry);
+              document.getElementById('details-dialog')?.classList.remove('hidden');
+            }}
+          />
         </div>
       )}
     </>

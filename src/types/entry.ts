@@ -12,6 +12,9 @@ export interface Entry {
   link?: string;
 }
 
+export const AUTHOR_FIELDS = ['author', 'director', 'artist', 'editor'] as const;
+export type AuthorField = (typeof AUTHOR_FIELDS)[number];
+
 export type FilterField = 'date' | 'author' | 'place' | 'type';
 
 export type ViewMode = 'map' | 'grid';
@@ -23,9 +26,4 @@ export interface ActiveFilters {
   type: string[];
 }
 
-export interface Facets {
-  date: string[];
-  author: string[];
-  place: string[];
-  type: string[];
-}
+export type Facets = ActiveFilters;

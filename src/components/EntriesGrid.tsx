@@ -7,11 +7,12 @@ import { cn } from '@/utils';
 
 type EntriesGridProps = {
   entries: Entry[];
+  onSelect: (entry: Entry) => void;
 };
 
 const LAYERS_BY_ID = new Map(LAYERS_CONFIG.map((l) => [l.id, l]));
 
-export const EntriesGrid: FC<EntriesGridProps> = ({ entries }) => {
+export const EntriesGrid: FC<EntriesGridProps> = ({ entries, onSelect }) => {
   const [pinned, setPinned] = useState<Set<string>>(new Set());
 
   const togglePin = (id: string) => {
@@ -35,7 +36,7 @@ export const EntriesGrid: FC<EntriesGridProps> = ({ entries }) => {
         return (
           <div
             key={entry.id}
-            onClick={() => togglePin(entry.id)}
+            onClick={() => { togglePin(entry.id); onSelect(entry); }}
             className={cn(
               'cursor-pointer transition-[filter] duration-200',
               !isPinned && 'grayscale hover:grayscale-0',

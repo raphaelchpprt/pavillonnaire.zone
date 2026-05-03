@@ -10,7 +10,6 @@ export function useEntries() {
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
 
     fetch('/api/entries')
       .then((r) => {

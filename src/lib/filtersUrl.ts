@@ -1,4 +1,4 @@
-import { ActiveFilters, FilterField } from '@/types/entry';
+import { ActiveFilters, FilterField, ViewMode } from '@/types/entry';
 
 const FILTER_FIELDS: FilterField[] = ['date', 'author', 'place', 'type'];
 
@@ -27,6 +27,20 @@ export function buildFilterUrl(
     } else {
       params.delete(field);
     }
+  }
+  const qs = params.toString();
+  return qs ? `/?${qs}` : '/';
+}
+
+export function buildViewUrl(
+  view: ViewMode | null,
+  existingParams: ReadableSearchParams,
+): string {
+  const params = new URLSearchParams(existingParams.toString());
+  if (view === 'grid') {
+    params.set('view', 'grid');
+  } else {
+    params.delete('view');
   }
   const qs = params.toString();
   return qs ? `/?${qs}` : '/';

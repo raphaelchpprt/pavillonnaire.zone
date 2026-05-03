@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Entry } from '@/types/entry';
+import { AUTHOR_FIELDS, Entry } from '@/types/entry';
 
 export const revalidate = 3600;
-
-const AUTHOR_FIELDS = ['author', 'director', 'artist', 'editor'] as const;
 
 interface MapboxFeature {
   id: string;
