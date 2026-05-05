@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { LAYER_IDS, LayerType } from '@/constants/layers';
 import { AUTHOR_FIELDS, Entry } from '@/types/entry';
 
 export const revalidate = 3600;
@@ -12,7 +13,7 @@ interface MapboxFeaturesResponse {
   features: MapboxFeature[];
 }
 
-function normalizeEntry(feature: MapboxFeature, category: string): Entry {
+function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   const p = feature.properties;
 
   const authors = AUTHOR_FIELDS.map((f) => p[f]).filter(
@@ -95,12 +96,16 @@ export async function GET() {
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
     const category = datasetNames?.[i] ?? datasetIds[i];
-    if (result.status === 'fulfilled') {
-      for (const feature of result.value) {
-        entries.push(normalizeEntry(feature, category));
-      }
-    } else {
+    if (result.status === 'rejected') {
       console.error(`Failed to fetch dataset ${category}:`, result.reason);
+      continue;
+    }
+    if (!LAYER_IDS.includes(category)) {
+      console.error(`Unknown category "${category}", skipping ${result.value.length} features`);
+      continue;
+    }
+    for (const feature of result.value) {
+      entries.push(normalizeEntry(feature, category as LayerType));
     }
   }
 

@@ -1,6 +1,6 @@
 import { ActiveFilters, FilterField, ViewMode } from '@/types/entry';
 
-const FILTER_FIELDS: FilterField[] = ['date', 'author', 'place', 'type'];
+const FILTER_FIELDS = ['date', 'author', 'place', 'type'] satisfies FilterField[];
 
 type ReadableSearchParams = Pick<URLSearchParams, 'get' | 'toString'>;
 

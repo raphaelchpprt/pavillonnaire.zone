@@ -46,8 +46,8 @@ export default function Homepage() {
     const hasFieldFilter = date.length || author.length || place.length || type.length;
     if (!hasCategoryFilter && !hasFieldFilter) return entries;
     return entries.filter((entry) => {
-      if (hasCategoryFilter && !selectedLayers.has(entry.category as LayerType)) return false;
-      if (date.length && !date.includes(String(entry.year ?? ''))) return false;
+      if (hasCategoryFilter && !selectedLayers.has(entry.category)) return false;
+      if (date.length && (entry.year == null || !date.includes(String(entry.year)))) return false;
       if (type.length && !type.includes(entry.type ?? '')) return false;
       if (place.length && !place.includes(entry.place ?? '')) return false;
       if (author.length && !entry.authors.some((a) => author.includes(a))) return false;

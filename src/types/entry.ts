@@ -1,6 +1,8 @@
+import type { LayerType } from '@/constants/layers';
+
 export interface Entry {
   id: string;
-  category: string;
+  category: LayerType;
   title: string;
   type?: string;
   authors: string[];
