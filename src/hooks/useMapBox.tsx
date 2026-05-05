@@ -167,11 +167,15 @@ export function useMapBox(activeFilters: ActiveFilters) {
     return () => map.remove();
   }, [isLaptop]);
 
+  const prevFilterKeyRef = useRef('');
   useEffect(() => {
     if (!mapRef.current || !isMapLoaded) return;
 
-    const filter = buildLayerFilter(activeFilters);
+    const filterKey = JSON.stringify(activeFilters);
+    if (filterKey === prevFilterKeyRef.current) return;
+    prevFilterKeyRef.current = filterKey;
 
+    const filter = buildLayerFilter(activeFilters);
     LAYER_IDS.forEach((id) => {
       if (mapRef.current?.getLayer(id)) {
         const map = mapRef.current;

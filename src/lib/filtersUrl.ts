@@ -2,11 +2,10 @@ import { ActiveFilters, FilterField, ViewMode } from '@/types/entry';
 
 const FILTER_FIELDS = ['date', 'author', 'place', 'type'] satisfies FilterField[];
 
-type ReadableSearchParams = Pick<URLSearchParams, 'get' | 'toString'>;
+type ReadableSearchParams = Pick<URLSearchParams, 'get' | 'getAll' | 'toString'>;
 
 export function parseFiltersFromUrl(searchParams: ReadableSearchParams): ActiveFilters {
-  const parse = (key: string) =>
-    searchParams.get(key)?.split(',').filter(Boolean) ?? [];
+  const parse = (key: string) => searchParams.getAll(key);
   return {
     date: parse('date'),
     author: parse('author'),
@@ -21,11 +20,9 @@ export function buildFilterUrl(
 ): string {
   const params = new URLSearchParams(existingParams.toString());
   for (const field of FILTER_FIELDS) {
-    const values = activeFilters[field];
-    if (values.length > 0) {
-      params.set(field, values.join(','));
-    } else {
-      params.delete(field);
+    params.delete(field);
+    for (const value of activeFilters[field]) {
+      params.append(field, value);
     }
   }
   const qs = params.toString();

@@ -34,11 +34,12 @@ export const EntriesGrid: FC<EntriesGridProps> = ({ entries, onSelect }) => {
         const Icon = LAYERS_BY_ID.get(entry.category)?.Icon;
 
         return (
-          <div
+          <button
             key={entry.id}
+            type="button"
             onClick={() => { togglePin(entry.id); onSelect(entry); }}
             className={cn(
-              'cursor-pointer transition-[filter] duration-200',
+              'cursor-pointer text-left transition-[filter] duration-200',
               !isPinned && 'grayscale hover:grayscale-0',
             )}
           >
@@ -57,7 +58,7 @@ export const EntriesGrid: FC<EntriesGridProps> = ({ entries, onSelect }) => {
               <span className="flex-1 font-serif text-sm leading-tight">{entry.title}</span>
               {Icon && <Icon className="h-5 w-5 shrink-0" />}
             </div>
-          </div>
+          </button>
         );
       })}
     </div>

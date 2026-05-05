@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { LAYER_IDS, LayerType } from '@/constants/layers';
+import { isLayerType, LayerType } from '@/constants/layers';
 import { AUTHOR_FIELDS, Entry } from '@/types/entry';
 
 export const revalidate = 3600;
@@ -100,12 +100,12 @@ export async function GET() {
       console.error(`Failed to fetch dataset ${category}:`, result.reason);
       continue;
     }
-    if (!LAYER_IDS.includes(category)) {
+    if (!isLayerType(category)) {
       console.error(`Unknown category "${category}", skipping ${result.value.length} features`);
       continue;
     }
     for (const feature of result.value) {
-      entries.push(normalizeEntry(feature, category as LayerType));
+      entries.push(normalizeEntry(feature, category));
     }
   }
 

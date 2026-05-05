@@ -133,6 +133,10 @@ export const LAYERS_CONFIG = [
   },
 ];
 
+export type LayerType = (typeof LAYERS_CONFIG)[number]['id'];
+
 export const LAYER_IDS = LAYERS_CONFIG.map((layer) => layer.id);
 
-export type LayerType = (typeof LAYERS_CONFIG)[number]['id'];
+export function isLayerType(id: string): id is LayerType {
+  return LAYER_IDS.includes(id);
+}

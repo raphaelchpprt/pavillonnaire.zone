@@ -2,7 +2,7 @@
 
 import { About } from '@/components/About';
 import { Instagram } from '@/components/Instagram';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -102,6 +102,14 @@ export default function Homepage() {
     document.body.addEventListener('keydown', hideAbout);
     return () => document.body.removeEventListener('keydown', hideAbout);
   }, [router, isAboutOpen]);
+
+  const prevIsIndexOpen = useRef(false);
+  useEffect(() => {
+    if (prevIsIndexOpen.current && !isIndexOpen) {
+      (document.getElementById('index-button') as HTMLButtonElement | null)?.focus();
+    }
+    prevIsIndexOpen.current = isIndexOpen;
+  }, [isIndexOpen]);
 
   useEffect(() => {
     if (!isIndexOpen) return;

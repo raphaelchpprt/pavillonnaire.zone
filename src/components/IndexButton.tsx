@@ -11,6 +11,7 @@ type IndexButtonProps = {
 export const IndexButton: FC<IndexButtonProps> = ({ onClick, className }) => {
   return (
     <button
+      id="index-button"
       type="button"
       onClick={onClick}
       aria-label="Ouvrir l'index"

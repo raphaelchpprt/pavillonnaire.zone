@@ -30,14 +30,23 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   currentView,
   onViewChange,
 }) => {
+  const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (isOpen) closeRef.current?.focus();
+    const el = asideRef.current;
+    if (!el) return;
+    if (isOpen) {
+      el.removeAttribute('inert');
+      closeRef.current?.focus();
+    } else {
+      el.setAttribute('inert', '');
+    }
   }, [isOpen]);
 
   return (
     <aside
+      ref={asideRef}
       aria-label="Filtres"
       aria-hidden={!isOpen}
       className={cn(
