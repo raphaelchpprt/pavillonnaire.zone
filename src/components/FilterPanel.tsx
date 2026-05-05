@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/utils';
-import { FC, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { ActiveFilters, Facets, FilterField, ViewMode } from '@/types/entry';
 
 type FilterPanelProps = {
@@ -30,6 +30,12 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   currentView,
   onViewChange,
 }) => {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (isOpen) closeRef.current?.focus();
+  }, [isOpen]);
+
   return (
     <aside
       aria-label="Filtres"
@@ -43,6 +49,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <h2 className="text-xl font-bold">filtres</h2>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Fermer les filtres"

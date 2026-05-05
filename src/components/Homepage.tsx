@@ -104,6 +104,15 @@ export default function Homepage() {
   }, [router, isAboutOpen]);
 
   useEffect(() => {
+    if (!isIndexOpen) return;
+    function hidePanel(e: KeyboardEvent) {
+      if (e.key === 'Escape') router.push(ROOT_PATH);
+    }
+    document.body.addEventListener('keydown', hidePanel);
+    return () => document.body.removeEventListener('keydown', hidePanel);
+  }, [router, isIndexOpen]);
+
+  useEffect(() => {
     function hideDetailsModal(e: KeyboardEvent) {
       if (e.key === 'Escape')
         document.getElementById('details-dialog')?.classList.add('hidden');

@@ -1,7 +1,7 @@
 # Plan — Feature Index (filtres + grille)
 
 > Document de travail conservé entre sessions. Source de vérité du plan d'implémentation de la feature "Index" sur pavillonnaire.zone.
-> Dernière mise à jour : 2026-05-03 — Phase 2 ✅ + Phase 3 ✅ complètes.
+> Dernière mise à jour : 2026-05-05 — Phases 1–4 ✅ complètes. Branche prête à merger.
 
 ---
 
@@ -506,23 +506,23 @@ Convention `<type>: <message>` (semantic) — observée dans `git log` :
   - [x] 2.8 Application Mapbox `setFilter` (OR intra-champ, AND inter-champs)
   - [x] 2.9 Persistance URL (`parseFiltersFromUrl` / `buildFilterUrl`)
   - [x] 2.10 Levée d'état dans `Homepage` (props vers `FilterPanel` + `useMapBox`)
-- [ ] **Phase 3** — Vue Grille (en cours)
+- [x] **Phase 3** — Vue Grille ✅ 2026-05-05
   - [x] 3.0 FilterPanel : titre `filtres` + `Carte ↔ Grille` sous le header + câblage `?view=`
   - [x] 3.1 `EntriesGrid.tsx` créé, reçoit les entrées filtrées côté client
   - [x] 3.2 Layout `flex flex-wrap items-end`, formats natifs, titre + logo sous l'image
   - [x] 3.3 `loading="lazy"`, `decoding="async"`, `alt={entry.title}`
   - [x] 3.4 N&B → couleur : `grayscale` au repos, `hover:grayscale-0`, pin `Set<id>` au clic
   - [x] 3.5 Logo catégorie : même filtre `grayscale` (appliqué sur la carte entière)
-  - [ ] 3.6 Scroll + scrollbar : à vérifier (le titre passe par-dessus grâce à `mix-blend-difference` et `z-10`)
-  - [ ] 3.7 `LegendFilter` actif en mode Grille (actuellement caché avec le conteneur map)
-  - [ ] 3.8 Clic carte → `DetailsModal` en overlay (nécessite bridge `Entry` → `MapboxGeoJSONFeature`)
-- [ ] **Phase 4** — Polish
-  - [ ] 4.1 Variante pixel
-  - [ ] 4.2 Animation slide-in
-  - [ ] 4.3 Responsive mobile
-  - [ ] 4.4 Accessibilité clavier
-  - [ ] 4.5 Virtualization (si besoin)
-  - [ ] 4.6 Lighthouse
+  - [x] 3.6 Scroll : titre z-20 > grille z-10 via `mix-blend-difference`, scrollbar masquée via `scrollbar-hide`
+  - [x] 3.7 `LegendFilter` sorti du conteneur map → visible et actif en mode Grille
+  - [x] 3.8 Clic carte → `DetailsModal` via bridge `Entry` → `MapboxGeoJSONFeature` dans Homepage
+- [x] **Phase 4** — Polish ✅ 2026-05-05
+  - [ ] 4.1 Variante pixel — optionnelle, non implémentée
+  - [x] 4.2 Animation slide-in : `transition-transform duration-200 ease-out` (Tailwind, déjà en Phase 3)
+  - [x] 4.3 Responsive mobile : `px-4 sm:px-12`, images `max-w-[40vw] sm:max-w-[200px]` (2 colonnes sur mobile)
+  - [x] 4.4 Accessibilité clavier : Esc ferme panneau + focus sur bouton close à l'ouverture
+  - [ ] 4.5 Virtualization — 68 entrées, non nécessaire
+  - [ ] 4.6 Lighthouse — à lancer manuellement en production
 
 ---
 
