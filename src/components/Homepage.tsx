@@ -122,8 +122,10 @@ export default function Homepage() {
 
   useEffect(() => {
     function hideDetailsModal(e: KeyboardEvent) {
-      if (e.key === 'Escape')
+      if (e.key === 'Escape') {
         document.getElementById('details-dialog')?.classList.add('hidden');
+        setGridSelectedEntry(undefined);
+      }
     }
 
     document.body.addEventListener('keydown', hideDetailsModal);
@@ -184,12 +186,16 @@ export default function Homepage() {
         />
       </div>
 
-      <DetailsModal feature={isGridView ? gridFeature : feature} />
+      <DetailsModal
+        feature={isGridView ? gridFeature : feature}
+        onClose={isGridView ? () => setGridSelectedEntry(undefined) : undefined}
+      />
 
       {isGridView && (
         <div className="absolute inset-0 z-10 bg-white">
           <EntriesGrid
             entries={filteredEntries}
+            selectedEntryId={gridSelectedEntry?.id}
             onSelect={(entry) => {
               setGridSelectedEntry(entry);
               document.getElementById('details-dialog')?.classList.remove('hidden');

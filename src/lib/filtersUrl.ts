@@ -36,6 +36,7 @@ export function buildViewUrl(
   const params = new URLSearchParams(existingParams.toString());
   if (view === 'grid') {
     params.set('view', 'grid');
+    params.delete('index');
   } else {
     params.delete('view');
   }

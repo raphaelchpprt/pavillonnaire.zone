@@ -1,46 +1,33 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Entry } from '@/types/entry';
 import { LAYERS_CONFIG } from '@/constants/layers';
 import { cn } from '@/utils';
 
 type EntriesGridProps = {
   entries: Entry[];
+  selectedEntryId?: string;
   onSelect: (entry: Entry) => void;
 };
 
 const LAYERS_BY_ID = new Map(LAYERS_CONFIG.map((l) => [l.id, l]));
 
-export const EntriesGrid: FC<EntriesGridProps> = ({ entries, onSelect }) => {
-  const [pinned, setPinned] = useState<Set<string>>(new Set());
-
-  const togglePin = (id: string) => {
-    setPinned((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
+export const EntriesGrid: FC<EntriesGridProps> = ({ entries, selectedEntryId, onSelect }) => {
   return (
     <div className="flex h-full w-full flex-wrap content-start items-end gap-x-6 gap-y-8 overflow-y-auto px-4 py-8 sm:px-12 scrollbar-hide">
       {entries.map((entry) => {
-        const isPinned = pinned.has(entry.id);
+        const isActive = entry.id === selectedEntryId;
         const Icon = LAYERS_BY_ID.get(entry.category)?.Icon;
 
         return (
           <button
             key={entry.id}
             type="button"
-            onClick={() => { togglePin(entry.id); onSelect(entry); }}
+            onClick={() => onSelect(entry)}
             className={cn(
               'cursor-pointer text-left transition-[filter] duration-200',
-              !isPinned && 'grayscale hover:grayscale-0',
+              !isActive && 'grayscale hover:grayscale-0',
             )}
           >
             {entry.image ? (

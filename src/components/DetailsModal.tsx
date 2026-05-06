@@ -11,13 +11,15 @@ function Text({ children, className }: ComponentProps<'p'>) {
 
 type DetailsModalProps = PropsWithChildren<{
   feature: MapboxGeoJSONFeature | undefined;
+  onClose?: () => void;
 }>;
 
-export const DetailsModal: FC<DetailsModalProps> = ({ feature }) => {
+export const DetailsModal: FC<DetailsModalProps> = ({ feature, onClose }) => {
   if (!feature) return null;
 
   function toggleAside() {
     document.getElementById('details-dialog')?.classList.add('hidden');
+    onClose?.();
   }
 
   const {
