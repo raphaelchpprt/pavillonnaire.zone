@@ -163,8 +163,10 @@ export function useMapBox(activeFilters: ActiveFilters) {
 
     map.on('click', toggleDetailsDialog);
 
-    // Clean up on unmount
-    return () => map.remove();
+    return () => {
+      prevFilterKeyRef.current = '';
+      map.remove();
+    };
   }, [isLaptop]);
 
   const prevFilterKeyRef = useRef('');

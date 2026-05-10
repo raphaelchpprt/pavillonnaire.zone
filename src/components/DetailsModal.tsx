@@ -100,12 +100,11 @@ const LinkItem: FC<{ linkTo: string }> = ({ linkTo }) => {
       href={linkTo}
       target="_blank"
       rel="noreferrer"
-      aria-hidden={true}
+      aria-label="Voir plus"
       className="my-6 p-6 transition-transform duration-300 hover:translate-x-2"
     >
-      <span className="sr-only">Voir plus</span>
-
       <svg
+        aria-hidden={true}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 173 27"

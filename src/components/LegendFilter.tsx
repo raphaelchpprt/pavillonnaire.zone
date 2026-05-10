@@ -17,7 +17,7 @@ export const LegendFilter: FC<LegendFilterProps> = ({
   return (
     <nav className="absolute left-6 inset-y-0 flex flex-col justify-center gap-4">
       {LAYERS_CONFIG.map((layer) => {
-        const { id, label, Icon, OutlineIcon } = layer;
+        const { id, label, Icon, OutlineIcon = Icon } = layer;
 
         const isSelected = selectedLayers.has(id);
 

@@ -48,7 +48,6 @@ export const FilterPanel: FC<FilterPanelProps> = ({
     <aside
       ref={asideRef}
       aria-label="Filtres"
-      aria-hidden={!isOpen}
       className={cn(
         'fixed right-0 top-0 z-40 flex h-full w-[min(100%,360px)] flex-col text-white mix-blend-difference transition-transform duration-200 ease-out',
         isOpen ? 'translate-x-0' : 'translate-x-full',
