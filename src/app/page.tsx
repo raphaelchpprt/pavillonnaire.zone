@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Homepage from '@/components/Homepage';
 import { ROOT_PATH } from '@/paths';
 
@@ -8,7 +9,9 @@ export default function Home() {
         <a href={ROOT_PATH}>pavillonnaire.zone</a>
       </h1>
 
-      <Homepage />
+      <Suspense>
+        <Homepage />
+      </Suspense>
     </main>
   );
 }
