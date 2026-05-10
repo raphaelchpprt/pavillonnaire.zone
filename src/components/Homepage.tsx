@@ -137,8 +137,9 @@ export default function Homepage() {
   return (
     <>
       <Link
-        href={isAboutOpen ? ROOT_PATH : ABOUT_PATH}
-        className="group absolute left-6 top-6 z-20 flex h-7 w-7 cursor-pointer items-center justify-center border-[1.5px] border-white fill-current text-white mix-blend-difference"
+        href={ABOUT_PATH}
+        onClick={isAboutOpen ? (e) => { e.preventDefault(); router.back(); } : undefined}
+        className="group absolute left-6 top-6 z-30 flex h-7 w-7 cursor-pointer items-center justify-center border-[1.5px] border-white fill-current text-white mix-blend-difference"
       >
         <div className="h-2.5 w-2.5 rotate-45 transform bg-white transition duration-300 ease-in-out group-hover:rotate-0" />
       </Link>
@@ -177,7 +178,7 @@ export default function Homepage() {
       <div
         className={cn(
           'absolute inset-y-0 left-0 z-20 transition-opacity duration-300 ease-in-out',
-          isMapLoaded || isGridView ? 'opacity-100' : 'opacity-0 pointer-events-none',
+          isMapLoaded && !isGridView ? 'opacity-100' : 'opacity-0 pointer-events-none',
         )}
       >
         <LegendFilter
