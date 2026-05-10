@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ABOUT_PATH, INDEX_PATH, ROOT_PATH } from '@/paths';
+import { ABOUT_PATH, ROOT_PATH } from '@/paths';
 import { useMapBox } from '@/hooks/useMapBox';
 import { useEntries } from '@/hooks/useEntries';
 import { DetailsModal } from '@/components/DetailsModal';
@@ -15,7 +15,7 @@ import { IndexButton } from '@/components/IndexButton';
 import { FilterPanel } from '@/components/FilterPanel';
 import { EntriesGrid } from '@/components/EntriesGrid';
 import { computeFacets } from '@/lib/facets';
-import { parseFiltersFromUrl, buildFilterUrl, buildViewUrl } from '@/lib/filtersUrl';
+import { parseFiltersFromUrl, buildFilterUrl, buildViewUrl, buildIndexOpenUrl, buildIndexCloseUrl } from '@/lib/filtersUrl';
 import { Entry, FilterField, ViewMode } from '@/types/entry';
 import { LayerType } from '@/constants/layers';
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
@@ -67,7 +67,11 @@ export default function Homepage() {
       properties: {
         title: e.title,
         type: e.type ?? null,
-        author: e.authors.join(', ') || null,
+        author: e.author ?? null,
+        director: e.director ?? null,
+        artist: e.artist ?? null,
+        album: e.album ?? null,
+        editor: e.editor ?? null,
         year: e.year ?? null,
         place: e.place ?? null,
         image: e.image ?? null,
@@ -114,11 +118,11 @@ export default function Homepage() {
   useEffect(() => {
     if (!isIndexOpen) return;
     function hidePanel(e: KeyboardEvent) {
-      if (e.key === 'Escape') router.push(ROOT_PATH);
+      if (e.key === 'Escape') router.push(buildIndexCloseUrl(searchParams));
     }
     document.body.addEventListener('keydown', hidePanel);
     return () => document.body.removeEventListener('keydown', hidePanel);
-  }, [router, isIndexOpen]);
+  }, [router, isIndexOpen, searchParams]);
 
   useEffect(() => {
     function hideDetailsModal(e: KeyboardEvent) {
@@ -134,6 +138,11 @@ export default function Homepage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isGridView || !gridSelectedEntry) return;
+    document.getElementById('details-dialog')?.classList.remove('hidden');
+  }, [isGridView, gridSelectedEntry]);
+
   return (
     <>
       <Link
@@ -145,12 +154,12 @@ export default function Homepage() {
       </Link>
 
       {!isAboutOpen && !isIndexOpen && (
-        <IndexButton onClick={() => router.push(INDEX_PATH)} />
+        <IndexButton onClick={() => router.push(buildIndexOpenUrl(searchParams))} />
       )}
 
       <FilterPanel
         isOpen={isIndexOpen}
-        onClose={() => router.push(ROOT_PATH)}
+        onClose={() => router.push(buildIndexCloseUrl(searchParams))}
         facets={facets}
         activeFilters={activeFilters}
         onFilterChange={toggleFilter}
@@ -199,7 +208,6 @@ export default function Homepage() {
             selectedEntryId={gridSelectedEntry?.id}
             onSelect={(entry) => {
               setGridSelectedEntry(entry);
-              document.getElementById('details-dialog')?.classList.remove('hidden');
             }}
           />
         </div>

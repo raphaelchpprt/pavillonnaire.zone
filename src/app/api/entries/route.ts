@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { MAPBOX_DEFAULT_DATASET_ID_TO_LAYER } from '@/constants/mapboxDatasets';
 import { isLayerType, LayerType } from '@/constants/layers';
 import { AUTHOR_FIELDS, Entry } from '@/types/entry';
 
@@ -13,11 +14,16 @@ interface MapboxFeaturesResponse {
   features: MapboxFeature[];
 }
 
+function strProp(record: Record<string, unknown>, key: string): string | undefined {
+  const v = record[key];
+  return typeof v === 'string' && v.trim().length > 0 ? v : undefined;
+}
+
 function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   const p = feature.properties;
 
-  const authors = AUTHOR_FIELDS.map((f) => p[f]).filter(
-    (v): v is string => typeof v === 'string' && v.length > 0,
+  const authors = AUTHOR_FIELDS.map((f) => strProp(p, f)).filter(
+    (v): v is string => v !== undefined,
   );
 
   let images: string[] | undefined;
@@ -35,6 +41,11 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
     title: typeof p.title === 'string' ? p.title : '',
     type: typeof p.type === 'string' ? p.type : undefined,
     authors,
+    author: strProp(p, 'author'),
+    director: strProp(p, 'director'),
+    artist: strProp(p, 'artist'),
+    album: strProp(p, 'album'),
+    editor: strProp(p, 'editor'),
     year: typeof p.year === 'number' ? p.year : undefined,
     place: typeof p.place === 'string' ? p.place : undefined,
     image: typeof p.image === 'string' ? p.image : undefined,
@@ -42,6 +53,18 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
     abstract: typeof p.abstract === 'string' ? p.abstract : undefined,
     link: typeof p.link === 'string' ? p.link : undefined,
   };
+}
+
+function resolveDatasetCategory(
+  index: number,
+  datasetIds: string[],
+  datasetNames: string[] | undefined,
+): LayerType | undefined {
+  const rawName = datasetNames?.[index]?.trim();
+  if (rawName && isLayerType(rawName)) return rawName;
+
+  const id = datasetIds[index];
+  return MAPBOX_DEFAULT_DATASET_ID_TO_LAYER[id];
 }
 
 async function fetchDataset(
@@ -95,13 +118,16 @@ export async function GET() {
   const entries: Entry[] = [];
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
-    const category = datasetNames?.[i] ?? datasetIds[i];
+    const id = datasetIds[i];
+    const category = resolveDatasetCategory(i, datasetIds, datasetNames);
     if (result.status === 'rejected') {
-      console.error(`Failed to fetch dataset ${category}:`, result.reason);
+      console.error(`Failed to fetch dataset ${category ?? id}:`, result.reason);
       continue;
     }
-    if (!isLayerType(category)) {
-      console.error(`Unknown category "${category}", skipping ${result.value.length} features`);
+    if (!category || !isLayerType(category)) {
+      console.error(
+        `Unknown category for dataset "${id}" (${datasetNames?.[i] ?? 'no MAPBOX_DATASET_NAMES entry'}), skipping ${result.value.length} features`,
+      );
       continue;
     }
     for (const feature of result.value) {

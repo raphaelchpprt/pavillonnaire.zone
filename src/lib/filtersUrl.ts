@@ -43,3 +43,17 @@ export function buildViewUrl(
   const qs = params.toString();
   return qs ? `/?${qs}` : '/';
 }
+
+export function buildIndexOpenUrl(existingParams: ReadableSearchParams): string {
+  const params = new URLSearchParams(existingParams.toString());
+  params.set('index', 'open');
+  const qs = params.toString();
+  return qs ? `/?${qs}` : '/';
+}
+
+export function buildIndexCloseUrl(existingParams: ReadableSearchParams): string {
+  const params = new URLSearchParams(existingParams.toString());
+  params.delete('index');
+  const qs = params.toString();
+  return qs ? `/?${qs}` : '/';
+}

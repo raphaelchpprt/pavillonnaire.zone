@@ -5,7 +5,14 @@ export interface Entry {
   category: LayerType;
   title: string;
   type?: string;
+  /** Values aggregated for facets / filtering (AUTHOR_FIELDS + album when present). */
   authors: string[];
+  /** Original property strings for modal display (parallel to map features). */
+  author?: string;
+  director?: string;
+  artist?: string;
+  album?: string;
+  editor?: string;
   year?: number;
   place?: string;
   image?: string;
@@ -14,7 +21,13 @@ export interface Entry {
   link?: string;
 }
 
-export const AUTHOR_FIELDS = ['author', 'director', 'artist', 'editor'] as const;
+export const AUTHOR_FIELDS = [
+  'author',
+  'director',
+  'artist',
+  'editor',
+  'album',
+] as const;
 export type AuthorField = (typeof AUTHOR_FIELDS)[number];
 
 export type FilterField = 'date' | 'author' | 'place' | 'type';
