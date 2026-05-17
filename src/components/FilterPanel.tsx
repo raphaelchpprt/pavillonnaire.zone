@@ -80,7 +80,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
             onClick={() => onViewChange('grid')}
             className={cn('cursor-pointer', currentView === 'grid' && 'font-bold')}
           >
-            Grille
+            Index
           </button>
         </div>
       </header>

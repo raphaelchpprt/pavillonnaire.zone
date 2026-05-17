@@ -186,7 +186,7 @@ export default function Homepage() {
 
       <div
         className={cn(
-          'absolute inset-y-0 left-0 z-20 transition-opacity duration-300 ease-in-out',
+          'absolute inset-y-0 left-0 z-20 pointer-events-none transition-opacity duration-300 ease-in-out',
           isMapLoaded && !isGridView ? 'opacity-100' : 'opacity-0 pointer-events-none',
         )}
       >
