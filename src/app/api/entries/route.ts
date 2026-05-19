@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { MAPBOX_DEFAULT_DATASET_ID_TO_LAYER } from '@/constants/mapboxDatasets';
 import { isLayerType, LayerType } from '@/constants/layers';
-import { AUTHOR_FIELDS, Entry } from '@/types/entry';
+import {
+  dedupeTokens,
+  parseImagesProperty,
+  parseMultiValue,
+} from '@/lib/normalize';
+import { AUTHOR_FILTER_FIELDS, Entry } from '@/types/entry';
 
 export const revalidate = 3600;
 
@@ -22,24 +27,26 @@ function strProp(record: Record<string, unknown>, key: string): string | undefin
 function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   const p = feature.properties;
 
-  const authors = AUTHOR_FIELDS.map((f) => strProp(p, f)).filter(
-    (v): v is string => v !== undefined,
+  const authors = dedupeTokens(
+    AUTHOR_FILTER_FIELDS.map((f) => strProp(p, f)).filter(
+      (v): v is string => v !== undefined,
+    ),
   );
 
-  let images: string[] | undefined;
-  if (typeof p.images === 'string') {
-    try {
-      images = JSON.parse(p.images);
-    } catch {
-      // ignore malformed JSON
-    }
-  }
+  const typeRaw = strProp(p, 'type');
+  const placeRaw = strProp(p, 'place');
+
+  const images = parseImagesProperty(p);
+  const image = strProp(p, 'image') ?? images?.[0];
 
   return {
     id: feature.id,
     category,
     title: typeof p.title === 'string' ? p.title : '',
-    type: typeof p.type === 'string' ? p.type : undefined,
+    type: typeRaw,
+    types: parseMultiValue(typeRaw),
+    place: placeRaw,
+    places: parseMultiValue(placeRaw),
     authors,
     author: strProp(p, 'author'),
     director: strProp(p, 'director'),
@@ -47,8 +54,7 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
     album: strProp(p, 'album'),
     editor: strProp(p, 'editor'),
     year: typeof p.year === 'number' ? p.year : undefined,
-    place: typeof p.place === 'string' ? p.place : undefined,
-    image: typeof p.image === 'string' ? p.image : undefined,
+    image,
     images,
     abstract: typeof p.abstract === 'string' ? p.abstract : undefined,
     link: typeof p.link === 'string' ? p.link : undefined,

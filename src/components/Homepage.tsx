@@ -15,7 +15,16 @@ import { IndexButton } from '@/components/IndexButton';
 import { FilterPanel } from '@/components/FilterPanel';
 import { EntriesGrid } from '@/components/EntriesGrid';
 import { computeFacets } from '@/lib/facets';
-import { parseFiltersFromUrl, buildFilterUrl, buildViewUrl, buildIndexOpenUrl, buildIndexCloseUrl } from '@/lib/filtersUrl';
+import { matchesFilterSelection } from '@/lib/normalize';
+import {
+  parseFiltersFromUrl,
+  buildFilterUrl,
+  buildFiltersResetUrl,
+  buildViewUrl,
+  buildIndexOpenUrl,
+  buildIndexCloseUrl,
+  hasPanelFilters,
+} from '@/lib/filtersUrl';
 import { Entry, FilterField, ViewMode } from '@/types/entry';
 import { LayerType } from '@/constants/layers';
 import { MapboxGeoJSONFeature } from 'mapbox-gl';
@@ -34,8 +43,17 @@ export default function Homepage() {
     [searchParams],
   );
 
-  const { mapContainerRef, feature, toggleLayer, selectedLayers, isMapLoaded } =
-    useMapBox(activeFilters);
+  const {
+    mapContainerRef,
+    feature,
+    toggleLayer,
+    clearSelectedLayers,
+    selectedLayers,
+    isMapLoaded,
+  } = useMapBox(activeFilters, !isGridView);
+
+  const hasActiveFilters =
+    hasPanelFilters(activeFilters) || selectedLayers.size > 0;
 
   const { entries } = useEntries();
   const facets = useMemo(() => computeFacets(entries), [entries]);
@@ -48,9 +66,10 @@ export default function Homepage() {
     return entries.filter((entry) => {
       if (hasCategoryFilter && !selectedLayers.has(entry.category)) return false;
       if (date.length && (entry.year == null || !date.includes(String(entry.year)))) return false;
-      if (type.length && !type.includes(entry.type ?? '')) return false;
-      if (place.length && !place.includes(entry.place ?? '')) return false;
-      if (author.length && !entry.authors.some((a) => author.includes(a))) return false;
+      if (type.length && !matchesFilterSelection(entry.types, type)) return false;
+      if (place.length && !matchesFilterSelection(entry.places, place)) return false;
+      if (author.length && !matchesFilterSelection(entry.authors, author))
+        return false;
       return true;
     });
   }, [entries, activeFilters, selectedLayers]);
@@ -97,6 +116,16 @@ export default function Homepage() {
   const handleViewChange = (v: ViewMode) => {
     router.push(buildViewUrl(v, searchParams));
   };
+
+  const handleResetFilters = () => {
+    clearSelectedLayers();
+    router.push(buildFiltersResetUrl(searchParams));
+  };
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('index-grid-view', isGridView);
+    return () => document.documentElement.classList.remove('index-grid-view');
+  }, [isGridView]);
 
   useEffect(() => {
     if (!isAboutOpen) return;
@@ -165,6 +194,8 @@ export default function Homepage() {
         onFilterChange={toggleFilter}
         currentView={isGridView ? 'grid' : 'map'}
         onViewChange={handleViewChange}
+        hasActiveFilters={hasActiveFilters}
+        onReset={handleResetFilters}
       />
 
       {isAboutOpen && (
@@ -184,17 +215,12 @@ export default function Homepage() {
         ref={mapContainerRef}
       />
 
-      <div
-        className={cn(
-          'absolute inset-y-0 left-0 z-20 pointer-events-none transition-opacity duration-300 ease-in-out',
-          isMapLoaded && !isGridView ? 'opacity-100' : 'opacity-0 pointer-events-none',
-        )}
-      >
+      {!isAboutOpen && (isMapLoaded || isGridView) && (
         <LegendFilter
           selectedLayers={selectedLayers}
           onFilterChange={toggleLayer}
         />
-      </div>
+      )}
 
       <DetailsModal
         feature={isGridView ? gridFeature : feature}
@@ -202,15 +228,21 @@ export default function Homepage() {
       />
 
       {isGridView && (
-        <div className="absolute inset-0 z-10 bg-white">
-          <EntriesGrid
-            entries={filteredEntries}
-            selectedEntryId={gridSelectedEntry?.id}
-            onSelect={(entry) => {
-              setGridSelectedEntry(entry);
-            }}
+        <>
+          <div
+            className="index-header-fade pointer-events-none fixed inset-x-0 top-0 z-[15]"
+            aria-hidden
           />
-        </div>
+          <div className="absolute inset-0 z-10 bg-white">
+            <EntriesGrid
+              entries={filteredEntries}
+              selectedEntryId={gridSelectedEntry?.id}
+              onSelect={(entry) => {
+                setGridSelectedEntry(entry);
+              }}
+            />
+          </div>
+        </>
       )}
     </>
   );

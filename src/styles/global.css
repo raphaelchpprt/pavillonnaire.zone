@@ -2,7 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Même largeur que la searchbar Mapbox dépliée (global.css .mapboxgl-ctrl-geocoder) */
+  --layout-rail: min(33.333vw, 360px);
+  --index-header-fade-height: 5rem;
+}
+
 @layer utilities {
+  .index-content-gutter {
+    padding-left: var(--layout-rail);
+    padding-right: var(--layout-rail);
+  }
+
+  .index-grid-scroll {
+    padding-top: var(--index-header-fade-height);
+  }
+
+  .index-header-fade {
+    height: var(--index-header-fade-height);
+    background: linear-gradient(
+      to bottom,
+      #ffffff 0%,
+      #ffffff 55%,
+      rgb(255 255 255 / 0) 100%
+    );
+  }
+
+  html.index-grid-view .site-title {
+    mix-blend-mode: normal;
+    color: #000;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

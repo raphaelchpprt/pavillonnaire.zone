@@ -12,6 +12,8 @@ type FilterPanelProps = {
   onFilterChange: (field: FilterField, value: string) => void;
   currentView: ViewMode;
   onViewChange: (view: ViewMode) => void;
+  hasActiveFilters: boolean;
+  onReset: () => void;
 };
 
 const SECTIONS: { field: FilterField; title: string }[] = [
@@ -21,6 +23,20 @@ const SECTIONS: { field: FilterField; title: string }[] = [
   { field: 'type', title: 'Type' },
 ];
 
+/** Colonne droite partagée (croix, flèches, ×) — alignée sur right-6 du bouton [i] */
+const panelRowGrid =
+  'grid w-full grid-cols-[minmax(0,1fr)_1.75rem] items-center';
+
+const panelControlCell = 'flex h-7 items-center justify-center';
+
+const viewToggleClass = (isActive: boolean) =>
+  cn(
+    'cursor-pointer px-1.5 py-0.5 transition-colors',
+    isActive
+      ? 'bg-white font-bold text-black'
+      : 'text-white hover:bg-white hover:text-black',
+  );
+
 export const FilterPanel: FC<FilterPanelProps> = ({
   isOpen,
   onClose,
@@ -29,6 +45,8 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   onFilterChange,
   currentView,
   onViewChange,
+  hasActiveFilters,
+  onReset,
 }) => {
   const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -49,43 +67,60 @@ export const FilterPanel: FC<FilterPanelProps> = ({
       ref={asideRef}
       aria-label="Filtres"
       className={cn(
-        'fixed right-0 top-0 z-40 flex h-full w-[min(100%,360px)] flex-col text-white mix-blend-difference transition-transform duration-200 ease-out',
+        'fixed right-0 top-0 z-40 flex h-full w-[min(100%,var(--layout-rail))] flex-col text-lg text-white mix-blend-difference transition-transform duration-200 ease-out',
         isOpen ? 'translate-x-0' : 'translate-x-full',
       )}
     >
-      <header>
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <h2 className="text-xl font-bold">filtres</h2>
+      <header className="px-6 pt-6">
+        <div className={panelRowGrid}>
+          <h2 className="font-bold leading-snug">filtres</h2>
           <button
             ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Fermer les filtres"
-            className="cursor-pointer text-xl leading-none"
+            className={cn(panelControlCell, 'cursor-pointer leading-none')}
           >
             x
           </button>
         </div>
-        <div className="flex items-center gap-1 px-4 pb-3 text-xl">
+        <div
+          className="flex items-center gap-1.5 pb-3 pt-2"
+          role="group"
+          aria-label="Vue"
+        >
           <button
             type="button"
             onClick={() => onViewChange('map')}
-            className={cn('cursor-pointer', currentView === 'map' && 'font-bold')}
+            aria-pressed={currentView === 'map'}
+            className={viewToggleClass(currentView === 'map')}
           >
             Carte
           </button>
-          <span aria-hidden="true"> ↔ </span>
+          <span aria-hidden="true" className="select-none opacity-50">
+            ↔
+          </span>
           <button
             type="button"
             onClick={() => onViewChange('grid')}
-            className={cn('cursor-pointer', currentView === 'grid' && 'font-bold')}
+            aria-pressed={currentView === 'grid'}
+            className={viewToggleClass(currentView === 'grid')}
           >
             Index
           </button>
         </div>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={onReset}
+            className={cn(viewToggleClass(false), 'mb-2 cursor-pointer text-left')}
+          >
+            reset
+          </button>
+        )}
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide">
         {SECTIONS.map(({ field, title }) => (
           <CollapsibleSection
             key={field}
@@ -120,13 +155,15 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
         aria-expanded={isExpanded}
-        className="flex w-full cursor-pointer items-center justify-between text-xl"
+        className={cn(panelRowGrid, 'cursor-pointer text-left')}
       >
         <span className="font-bold">{title}</span>
-        <span aria-hidden="true">{isExpanded ? '↑' : '↓'}</span>
+        <span aria-hidden="true" className={panelControlCell}>
+          {isExpanded ? '↑' : '↓'}
+        </span>
       </button>
       {isExpanded && (
-        <div className="flex flex-col py-1 text-xl">
+        <div className="flex flex-col py-1">
           {values.length === 0 && <span className="opacity-60">—</span>}
           {values.map((value) => {
             const isActive = activeValues.includes(value);
@@ -137,14 +174,23 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
                 onClick={() => onToggle(value)}
                 aria-pressed={isActive}
                 className={cn(
-                  'flex cursor-pointer items-center justify-between px-1 text-left',
+                  panelRowGrid,
+                  'cursor-pointer px-1 text-left',
                   isActive
                     ? 'bg-white text-black'
-                    : 'bg-transparent text-white hover:underline',
+                    : 'bg-transparent text-white hover:bg-white hover:text-black',
                 )}
               >
-                <span>{value}</span>
-                {isActive && <span aria-hidden="true">×</span>}
+                <span className={cn('min-w-0', isActive && 'font-bold')}>
+                  {value}
+                </span>
+                <span className={panelControlCell}>
+                  {isActive && (
+                    <span aria-hidden="true" className="font-bold">
+                      ×
+                    </span>
+                  )}
+                </span>
               </button>
             );
           })}

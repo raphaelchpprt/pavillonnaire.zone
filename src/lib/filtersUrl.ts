@@ -14,6 +14,21 @@ export function parseFiltersFromUrl(searchParams: ReadableSearchParams): ActiveF
   };
 }
 
+export function hasPanelFilters(activeFilters: ActiveFilters): boolean {
+  return FILTER_FIELDS.some((field) => activeFilters[field].length > 0);
+}
+
+export function buildFiltersResetUrl(
+  existingParams: ReadableSearchParams,
+): string {
+  const params = new URLSearchParams(existingParams.toString());
+  for (const field of FILTER_FIELDS) {
+    params.delete(field);
+  }
+  const qs = params.toString();
+  return qs ? `/?${qs}` : '/';
+}
+
 export function buildFilterUrl(
   activeFilters: ActiveFilters,
   existingParams: ReadableSearchParams,
@@ -36,7 +51,6 @@ export function buildViewUrl(
   const params = new URLSearchParams(existingParams.toString());
   if (view === 'grid') {
     params.set('view', 'grid');
-    params.delete('index');
   } else {
     params.delete('view');
   }

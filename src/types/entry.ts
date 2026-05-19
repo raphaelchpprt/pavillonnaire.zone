@@ -4,8 +4,15 @@ export interface Entry {
   id: string;
   category: LayerType;
   title: string;
+  /** Valeur brute Mapbox (affichage). */
   type?: string;
-  /** Values aggregated for facets / filtering (AUTHOR_FIELDS + album when present). */
+  /** Types normalisés pour facettes / filtres (séparateur ` ; `). */
+  types: string[];
+  /** Valeur brute Mapbox (affichage). */
+  place?: string;
+  /** Lieux normalisés pour facettes / filtres (séparateur ` ; `). */
+  places: string[];
+  /** Valeurs pour facette / filtre Auteur.ices (author, director, artist). */
   authors: string[];
   /** Original property strings for modal display (parallel to map features). */
   author?: string;
@@ -14,7 +21,6 @@ export interface Entry {
   album?: string;
   editor?: string;
   year?: number;
-  place?: string;
   image?: string;
   images?: string[];
   abstract?: string;
@@ -29,6 +35,13 @@ export const AUTHOR_FIELDS = [
   'album',
 ] as const;
 export type AuthorField = (typeof AUTHOR_FIELDS)[number];
+
+/** Sous-ensemble utilisé pour le filtre « Auteur.ices » (hors éditeur / album). */
+export const AUTHOR_FILTER_FIELDS = [
+  'author',
+  'director',
+  'artist',
+] as const satisfies readonly AuthorField[];
 
 export type FilterField = 'date' | 'author' | 'place' | 'type';
 

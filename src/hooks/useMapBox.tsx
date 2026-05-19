@@ -7,7 +7,11 @@ import ReactDOM from 'react-dom';
 import mapboxgl, { MapboxGeoJSONFeature, Marker } from 'mapbox-gl';
 import { Tooltip } from '@/components/Tooltip';
 import { LAYER_IDS, LayerType } from '@/constants/layers';
-import { AUTHOR_FIELDS, ActiveFilters } from '@/types/entry';
+import {
+  buildMapboxAuthorMatch,
+  buildMapboxMultiValueFilter,
+} from '@/lib/normalize';
+import { AUTHOR_FILTER_FIELDS, ActiveFilters } from '@/types/entry';
 
 const INITIAL_LONGITUDE = 1.872;
 const INITIAL_LATITUDE = 46.62;
@@ -31,23 +35,17 @@ function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
       ...activeFilters.date.map((d) => ['==', ['to-string', ['get', 'year']], d]),
     ]);
   }
-  if (activeFilters.type.length > 0) {
-    conditions.push([
-      'any',
-      ...activeFilters.type.map((t) => ['==', ['get', 'type'], t]),
-    ]);
-  }
-  if (activeFilters.place.length > 0) {
-    conditions.push([
-      'any',
-      ...activeFilters.place.map((p) => ['==', ['get', 'place'], p]),
-    ]);
-  }
+  const typeFilter = buildMapboxMultiValueFilter('type', activeFilters.type);
+  if (typeFilter) conditions.push(typeFilter);
+
+  const placeFilter = buildMapboxMultiValueFilter('place', activeFilters.place);
+  if (placeFilter) conditions.push(placeFilter);
+
   if (activeFilters.author.length > 0) {
     conditions.push([
       'any',
       ...activeFilters.author.flatMap((a) =>
-        AUTHOR_FIELDS.map((f) => ['==', ['get', f], a]),
+        AUTHOR_FILTER_FIELDS.map((f) => buildMapboxAuthorMatch(f, a)),
       ),
     ]);
   }
@@ -55,7 +53,7 @@ function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
   return conditions.length > 0 ? ['all', ...conditions] : null;
 }
 
-export function useMapBox(activeFilters: ActiveFilters) {
+export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
   const [feature, setFeature] = useState<MapboxGeoJSONFeature | undefined>();
   const [selectedLayers, setSelectedLayers] = useState<Set<LayerType>>(
     new Set()
@@ -169,6 +167,21 @@ export function useMapBox(activeFilters: ActiveFilters) {
     };
   }, [isLaptop]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !isMapLoaded || !isMapVisible) return;
+
+    let cancelled = false;
+    const resize = () => {
+      if (!cancelled) map.resize();
+    };
+    requestAnimationFrame(() => requestAnimationFrame(resize));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMapVisible, isMapLoaded]);
+
   const prevFilterKeyRef = useRef('');
   useEffect(() => {
     if (!mapRef.current || !isMapLoaded) return;
@@ -214,5 +227,24 @@ export function useMapBox(activeFilters: ActiveFilters) {
     });
   };
 
-  return { mapContainerRef, feature, toggleLayer, selectedLayers, isMapLoaded };
+  const clearSelectedLayers = () => {
+    const empty = new Set<LayerType>();
+    selectedLayersRef.current = empty;
+    setSelectedLayers(empty);
+
+    LAYER_IDS.forEach((id) => {
+      if (mapRef.current?.getLayer(id)) {
+        mapRef.current.setLayoutProperty(id, 'visibility', 'visible');
+      }
+    });
+  };
+
+  return {
+    mapContainerRef,
+    feature,
+    toggleLayer,
+    clearSelectedLayers,
+    selectedLayers,
+    isMapLoaded,
+  };
 }
