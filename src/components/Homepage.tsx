@@ -219,6 +219,7 @@ export default function Homepage() {
         <LegendFilter
           selectedLayers={selectedLayers}
           onFilterChange={toggleLayer}
+          className={cn(isIndexOpen && isGridView && 'max-md:hidden')}
         />
       )}
 
@@ -233,7 +234,12 @@ export default function Homepage() {
             className="index-header-fade pointer-events-none fixed inset-x-0 top-0 z-[15]"
             aria-hidden
           />
-          <div className="absolute inset-0 z-10 bg-white">
+          <div
+            className={cn(
+              'absolute inset-0 z-10 bg-white',
+              isIndexOpen && 'max-md:hidden',
+            )}
+          >
             <EntriesGrid
               entries={filteredEntries}
               selectedEntryId={gridSelectedEntry?.id}

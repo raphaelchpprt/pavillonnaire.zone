@@ -8,16 +8,21 @@ import { LAYERS_CONFIG, LayerType } from '@/constants/layers';
 interface LegendFilterProps {
   selectedLayers: Set<LayerType>;
   onFilterChange: (layerId: LayerType) => void;
+  className?: string;
 }
 
 export const LegendFilter: FC<LegendFilterProps> = ({
   selectedLayers,
   onFilterChange,
+  className,
 }) => {
   return (
     <nav
       aria-label="Filtres par catégorie"
-      className="pointer-events-none absolute inset-y-0 left-6 z-30 flex flex-col justify-center gap-4 mix-blend-difference"
+      className={cn(
+        'pointer-events-none absolute inset-y-0 left-6 z-30 flex flex-col justify-center gap-4 mix-blend-difference',
+        className,
+      )}
     >
       {LAYERS_CONFIG.map((layer) => {
         const { id, label, Icon, OutlineIcon = Icon } = layer;

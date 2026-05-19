@@ -29,12 +29,38 @@ const panelRowGrid =
 
 const panelControlCell = 'flex h-7 items-center justify-center';
 
-const viewToggleClass = (isActive: boolean) =>
+const viewToggleClass = (isActive: boolean, isGridView: boolean) =>
   cn(
     'cursor-pointer px-1.5 py-0.5 transition-colors',
-    isActive
-      ? 'bg-white font-bold text-black'
-      : 'text-white hover:bg-white hover:text-black',
+    isGridView
+      ? cn(
+          isActive &&
+            'max-md:bg-black max-md:font-bold max-md:text-white md:bg-white md:font-bold md:text-black',
+          !isActive &&
+            'max-md:text-black max-md:hover:bg-black max-md:hover:text-white md:text-white md:hover:bg-white md:hover:text-black',
+        )
+      : cn(
+          isActive && 'bg-white font-bold text-black',
+          !isActive && 'text-white hover:bg-white hover:text-black',
+        ),
+  );
+
+const filterValueClass = (isActive: boolean, isGridView: boolean) =>
+  cn(
+    panelRowGrid,
+    'cursor-pointer px-1 text-left',
+    isGridView
+      ? cn(
+          isActive &&
+            'max-md:bg-black max-md:text-white md:bg-white md:text-black',
+          !isActive &&
+            'max-md:text-black max-md:hover:bg-black max-md:hover:text-white md:bg-transparent md:text-white md:hover:bg-white md:hover:text-black',
+        )
+      : cn(
+          isActive && 'bg-white text-black',
+          !isActive &&
+            'bg-transparent text-white hover:bg-white hover:text-black',
+        ),
   );
 
 export const FilterPanel: FC<FilterPanelProps> = ({
@@ -48,6 +74,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   hasActiveFilters,
   onReset,
 }) => {
+  const isGridView = currentView === 'grid';
   const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -67,7 +94,12 @@ export const FilterPanel: FC<FilterPanelProps> = ({
       ref={asideRef}
       aria-label="Filtres"
       className={cn(
-        'fixed right-0 top-0 z-40 flex h-full w-full flex-col text-lg text-white mix-blend-difference transition-transform duration-200 ease-out md:w-[min(100%,var(--layout-rail))]',
+        'fixed right-0 top-0 z-40 flex h-full w-full flex-col text-lg transition-transform duration-200 ease-out md:w-[min(100%,var(--layout-rail))]',
+        'max-md:mix-blend-normal',
+        isGridView
+          ? 'max-md:bg-white max-md:text-black'
+          : 'max-md:bg-black max-md:text-white',
+        'md:bg-transparent md:text-white md:mix-blend-difference',
         isOpen ? 'translate-x-0' : 'translate-x-full',
       )}
     >
@@ -93,7 +125,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
             type="button"
             onClick={() => onViewChange('map')}
             aria-pressed={currentView === 'map'}
-            className={viewToggleClass(currentView === 'map')}
+            className={viewToggleClass(currentView === 'map', isGridView)}
           >
             Carte
           </button>
@@ -104,7 +136,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
             type="button"
             onClick={() => onViewChange('grid')}
             aria-pressed={currentView === 'grid'}
-            className={viewToggleClass(currentView === 'grid')}
+            className={viewToggleClass(currentView === 'grid', isGridView)}
           >
             Index
           </button>
@@ -113,7 +145,10 @@ export const FilterPanel: FC<FilterPanelProps> = ({
           <button
             type="button"
             onClick={onReset}
-            className={cn(viewToggleClass(false), 'mb-2 cursor-pointer text-left')}
+            className={cn(
+              viewToggleClass(false, isGridView),
+              'mb-2 cursor-pointer text-left',
+            )}
           >
             reset
           </button>
@@ -128,6 +163,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
             values={facets[field]}
             activeValues={activeFilters[field]}
             onToggle={(value) => onFilterChange(field, value)}
+            isGridView={isGridView}
           />
         ))}
       </div>
@@ -140,6 +176,7 @@ type CollapsibleSectionProps = {
   values: string[];
   activeValues: string[];
   onToggle: (value: string) => void;
+  isGridView: boolean;
 };
 
 const CollapsibleSection: FC<CollapsibleSectionProps> = ({
@@ -147,6 +184,7 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
   values,
   activeValues,
   onToggle,
+  isGridView,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
@@ -173,13 +211,7 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
                 type="button"
                 onClick={() => onToggle(value)}
                 aria-pressed={isActive}
-                className={cn(
-                  panelRowGrid,
-                  'cursor-pointer px-1 text-left',
-                  isActive
-                    ? 'bg-white text-black'
-                    : 'bg-transparent text-white hover:bg-white hover:text-black',
-                )}
+                className={filterValueClass(isActive, isGridView)}
               >
                 <span className={cn('min-w-0', isActive && 'font-bold')}>
                   {value}
