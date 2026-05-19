@@ -66,6 +66,7 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const tooltipRef = useRef(new mapboxgl.Popup({ offset: [0, 0] }));
   const selectedLayersRef = useRef<Set<LayerType>>(new Set());
+  const prevFilterKeyRef = useRef('');
 
   useEffect(() => {
     const map: mapboxgl.Map = new mapboxgl.Map({
@@ -182,7 +183,6 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
     };
   }, [isMapVisible, isMapLoaded]);
 
-  const prevFilterKeyRef = useRef('');
   useEffect(() => {
     if (!mapRef.current || !isMapLoaded) return;
 

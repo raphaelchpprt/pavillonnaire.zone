@@ -34,7 +34,7 @@ export const EntryThumbnail: FC<EntryThumbnailProps> = ({ entry, alt }) => {
       sizes="(max-width: 1023px) 28vw, (max-width: 1279px) 18vw, 12vw"
       className="block h-auto w-full max-w-full"
       onError={() => {
-        setUrlIndex((i) => (i + 1 < urls.length ? i + 1 : i));
+        setUrlIndex((i) => i + 1);
       }}
     />
   );

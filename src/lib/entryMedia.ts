@@ -13,7 +13,3 @@ export function getEntryThumbnailUrls(entry: Entry): string[] {
   entry.images?.forEach(add);
   return urls;
 }
-
-export function getEntryThumbnail(entry: Entry): string | undefined {
-  return getEntryThumbnailUrls(entry)[0];
-}

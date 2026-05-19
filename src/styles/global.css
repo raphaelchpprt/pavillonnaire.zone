@@ -5,13 +5,20 @@
 :root {
   /* Même largeur que la searchbar Mapbox dépliée (global.css .mapboxgl-ctrl-geocoder) */
   --layout-rail: min(33.333vw, 360px);
+  --index-content-gutter: 1.5rem;
   --index-header-fade-height: 5rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --index-content-gutter: var(--layout-rail);
+  }
 }
 
 @layer utilities {
   .index-content-gutter {
-    padding-left: var(--layout-rail);
-    padding-right: var(--layout-rail);
+    padding-left: var(--index-content-gutter);
+    padding-right: var(--index-content-gutter);
   }
 
   .index-grid-scroll {
