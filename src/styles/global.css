@@ -6,8 +6,8 @@
   /* Même largeur que la searchbar Mapbox dépliée (global.css .mapboxgl-ctrl-geocoder) */
   --layout-rail: min(33.333vw, 360px);
   --index-content-gutter-right: 1.5rem;
-  /* left-6 + icône légende (~28px) — évite le chevauchement sur la 1ʳᵉ colonne */
-  --index-content-gutter-left: 3.5rem;
+  /* left-6 + icône légende (28px) + tampon — évite le chevauchement avec le label hover */
+  --index-content-gutter-left: 4.5rem;
   --index-header-fade-height: 5rem;
 }
 

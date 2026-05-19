@@ -145,10 +145,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
           <button
             type="button"
             onClick={onReset}
-            className={cn(
-              viewToggleClass(false, isGridView),
-              'mb-2 cursor-pointer text-left',
-            )}
+            className="mb-2 cursor-pointer italic underline underline-offset-2 hover:no-underline"
           >
             reset
           </button>
