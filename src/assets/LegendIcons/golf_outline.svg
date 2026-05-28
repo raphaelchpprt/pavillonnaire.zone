@@ -4,7 +4,7 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50"
 	style="enable-background:new 0 0 50 50;" xml:space="preserve">
 	<g id="golf">
-		<path d="M0,0h50v50H0V0z" fill="none" stroke="white" stroke-width="5" />
-		<path class="st11" d="M8.33,0v50h8.33V0H25v50h8.33V0h8.33v50H50V0H8.33z" stroke="white" stroke-width="3" fill="none" />
+		<path d="M0,0h50v50H0V0z" fill="none" stroke="currentColor" stroke-width="5" />
+		<path class="st11" d="M8.33,0v50h8.33V0H25v50h8.33V0h8.33v50H50V0H8.33z" stroke="currentColor" stroke-width="3" fill="none" />
 	</g>
 </svg>

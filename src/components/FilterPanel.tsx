@@ -1,8 +1,15 @@
-'use client';
+"use client";
 
-import { cn } from '@/utils';
-import { FC, useEffect, useRef, useState } from 'react';
-import { ActiveFilters, Facets, FilterField, ViewMode } from '@/types/entry';
+import { formatMultiValueString } from "@/lib/normalize";
+import { cn } from "@/utils";
+import { FC, useEffect, useRef, useState } from "react";
+import {
+  ActiveFilters,
+  EntrySort,
+  Facets,
+  FilterField,
+  ViewMode,
+} from "@/types/entry";
 
 type FilterPanelProps = {
   isOpen: boolean;
@@ -14,52 +21,87 @@ type FilterPanelProps = {
   onViewChange: (view: ViewMode) => void;
   hasActiveFilters: boolean;
   onReset: () => void;
+  entrySort: EntrySort;
+  onEntrySortChange: (sort: EntrySort) => void;
 };
 
+const ENTRY_SORT_LABELS: Record<EntrySort, string> = {
+  title: "titres A → Z",
+  "date-desc": "date décroissante",
+  "date-asc": "date croissante",
+};
+
+const SortAlphabetIcon: FC<{ className?: string }> = ({ className }) => (
+  <span
+    className={cn("inline-flex items-center gap-0.5 leading-none", className)}
+    aria-hidden
+  >
+    <span className="flex flex-col text-[0.5rem] font-bold leading-[0.9]">
+      <span>A</span>
+      <span>B</span>
+    </span>
+    <span className="text-[0.65rem] leading-none">↓</span>
+  </span>
+);
+
 const SECTIONS: { field: FilterField; title: string }[] = [
-  { field: 'date', title: 'Date' },
-  { field: 'author', title: 'Auteur.ices' },
-  { field: 'place', title: 'Lieu' },
-  { field: 'type', title: 'Type' },
+  { field: "date", title: "Date" },
+  { field: "author", title: "Auteur.ices" },
+  { field: "place", title: "Lieu" },
+  { field: "type", title: "Type" },
 ];
 
 /** Colonne droite partagée (croix, flèches, ×) — alignée sur right-6 du bouton [i] */
 const panelRowGrid =
-  'grid w-full grid-cols-[minmax(0,1fr)_1.75rem] items-center';
+  "grid w-full grid-cols-[minmax(0,1fr)_1.75rem] items-center";
 
-const panelControlCell = 'flex h-7 items-center justify-center';
+const panelControlCell = "flex h-7 items-center justify-center";
 
-const viewToggleClass = (isActive: boolean, isGridView: boolean) =>
+const panelButtonBorder = "border-[1.5px] border-current";
+
+const panelCloseButtonClass = (isGridView: boolean) =>
   cn(
-    'cursor-pointer px-1.5 py-0.5 transition-colors',
+    "grid h-7 w-7 shrink-0 cursor-pointer place-items-center transition-colors",
+    panelButtonBorder,
+    isGridView
+      ? "border-black text-black hover:bg-black hover:text-white"
+      : "border-white text-white hover:bg-white hover:text-black",
+  );
+
+const panelToggleButtonClass = (isActive: boolean, isGridView: boolean) =>
+  cn(
+    "cursor-pointer px-1.5 py-0.5 transition-colors disabled:cursor-default disabled:pointer-events-none",
+    panelButtonBorder,
     isGridView
       ? cn(
-          isActive &&
-            'max-md:bg-black max-md:font-bold max-md:text-white md:bg-white md:font-bold md:text-black',
-          !isActive &&
-            'max-md:text-black max-md:hover:bg-black max-md:hover:text-white md:text-white md:hover:bg-white md:hover:text-black',
+          isActive && "bg-black text-white",
+          !isActive && "text-black hover:bg-black hover:text-white",
         )
       : cn(
-          isActive && 'bg-white font-bold text-black',
-          !isActive && 'text-white hover:bg-white hover:text-black',
+          isActive && "bg-white text-black",
+          !isActive && "text-white hover:bg-white hover:text-black",
         ),
+  );
+
+const panelSortButtonClass = (isActive: boolean, isGridView: boolean) =>
+  cn(
+    panelToggleButtonClass(isActive, isGridView),
+    "text-base leading-none px-1.5 py-0.5",
   );
 
 const filterValueClass = (isActive: boolean, isGridView: boolean) =>
   cn(
     panelRowGrid,
-    'cursor-pointer px-1 text-left',
+    "cursor-pointer px-1 text-left",
     isGridView
       ? cn(
-          isActive &&
-            'max-md:bg-black max-md:text-white md:bg-white md:text-black',
-          !isActive &&
-            'max-md:text-black max-md:hover:bg-black max-md:hover:text-white md:bg-transparent md:text-white md:hover:bg-white md:hover:text-black',
+          isActive && "bg-black text-white",
+          !isActive && "text-black hover:bg-black hover:text-white",
         )
       : cn(
-          isActive && 'bg-white text-black',
+          isActive && "bg-white text-black",
           !isActive &&
-            'bg-transparent text-white hover:bg-white hover:text-black',
+            "bg-transparent text-white hover:bg-white hover:text-black",
         ),
   );
 
@@ -73,8 +115,10 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   onViewChange,
   hasActiveFilters,
   onReset,
+  entrySort,
+  onEntrySortChange,
 }) => {
-  const isGridView = currentView === 'grid';
+  const isGridView = currentView === "grid";
   const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -82,10 +126,10 @@ export const FilterPanel: FC<FilterPanelProps> = ({
     const el = asideRef.current;
     if (!el) return;
     if (isOpen) {
-      el.removeAttribute('inert');
+      el.removeAttribute("inert");
       closeRef.current?.focus();
     } else {
-      el.setAttribute('inert', '');
+      el.setAttribute("inert", "");
     }
   }, [isOpen]);
 
@@ -94,38 +138,45 @@ export const FilterPanel: FC<FilterPanelProps> = ({
       ref={asideRef}
       aria-label="Filtres"
       className={cn(
-        'fixed right-0 top-0 z-40 flex h-full w-full flex-col text-lg transition-transform duration-200 ease-out md:w-[min(100%,var(--layout-rail))]',
-        'max-md:mix-blend-normal',
+        "fixed right-0 top-0 z-40 flex h-full w-full flex-col text-lg md:w-[min(100%,var(--layout-rail))]",
         isGridView
-          ? 'max-md:bg-white max-md:text-black'
-          : 'max-md:bg-black max-md:text-white',
-        'md:bg-transparent md:text-white md:mix-blend-difference',
-        isOpen ? 'translate-x-0' : 'translate-x-full',
+          ? "bg-white text-black"
+          : "max-md:bg-black max-md:text-white md:bg-transparent md:text-white md:mix-blend-difference",
+        isOpen && "pointer-events-none",
+        !isOpen && "hidden",
       )}
     >
-      <header className="px-6 pt-6">
+      <header className="pointer-events-auto px-6 pt-6">
         <div className={panelRowGrid}>
-          <h2 className="font-bold leading-snug">filtres</h2>
+          <h2 className="font-bold leading-snug">Filtres</h2>
           <button
             ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Fermer les filtres"
-            className={cn(panelControlCell, 'cursor-pointer leading-none')}
+            className={panelCloseButtonClass(isGridView)}
           >
-            x
+            <span aria-hidden="true" className="text-lg leading-none">
+              x
+            </span>
           </button>
         </div>
         <div
-          className="flex items-center gap-1.5 pb-3 pt-2"
+          className={cn(
+            "flex items-center gap-1.5 pb-3 pt-2",
+            isGridView && "pb-4",
+          )}
           role="group"
           aria-label="Vue"
         >
           <button
             type="button"
-            onClick={() => onViewChange('map')}
-            aria-pressed={currentView === 'map'}
-            className={viewToggleClass(currentView === 'map', isGridView)}
+            onClick={() => onViewChange("map")}
+            aria-pressed={currentView === "map"}
+            className={panelToggleButtonClass(
+              currentView === "map",
+              isGridView,
+            )}
           >
             Carte
           </button>
@@ -134,35 +185,110 @@ export const FilterPanel: FC<FilterPanelProps> = ({
           </span>
           <button
             type="button"
-            onClick={() => onViewChange('grid')}
-            aria-pressed={currentView === 'grid'}
-            className={viewToggleClass(currentView === 'grid', isGridView)}
+            onClick={() => onViewChange("grid")}
+            aria-pressed={currentView === "grid"}
+            className={panelToggleButtonClass(
+              currentView === "grid",
+              isGridView,
+            )}
           >
             Index
           </button>
+          {!isGridView && (
+            <button
+              type="button"
+              onClick={onReset}
+              aria-pressed={hasActiveFilters}
+              className={cn(
+                panelToggleButtonClass(hasActiveFilters, isGridView),
+                "ml-auto",
+              )}
+            >
+              reset
+            </button>
+          )}
         </div>
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="mb-2 cursor-pointer italic underline underline-offset-2 hover:no-underline"
+        {isGridView && (
+          <div
+            className="flex flex-wrap items-center gap-1.5 border-t border-black pb-3 pt-4"
+            role="group"
+            aria-label="Tri et réinitialisation"
           >
-            reset
-          </button>
+            <button
+              type="button"
+              onClick={() => onEntrySortChange("title")}
+              aria-pressed={entrySort === "title"}
+              aria-label={ENTRY_SORT_LABELS.title}
+              className={panelSortButtonClass(
+                entrySort === "title",
+                isGridView,
+              )}
+            >
+              <span className="flex items-center gap-1.5">
+                trier
+                <SortAlphabetIcon />
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onEntrySortChange("date-desc")}
+              aria-pressed={entrySort === "date-desc"}
+              className={panelSortButtonClass(
+                entrySort === "date-desc",
+                isGridView,
+              )}
+            >
+              date ↓
+            </button>
+            <button
+              type="button"
+              onClick={() => onEntrySortChange("date-asc")}
+              aria-pressed={entrySort === "date-asc"}
+              className={panelSortButtonClass(
+                entrySort === "date-asc",
+                isGridView,
+              )}
+            >
+              date ↑
+            </button>
+            <button
+              type="button"
+              onClick={onReset}
+              aria-pressed={hasActiveFilters}
+              className={cn(
+                panelSortButtonClass(hasActiveFilters, isGridView),
+                "ml-auto",
+              )}
+            >
+              reset
+            </button>
+          </div>
         )}
       </header>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide">
-        {SECTIONS.map(({ field, title }) => (
-          <CollapsibleSection
-            key={field}
-            title={title}
-            values={facets[field]}
-            activeValues={activeFilters[field]}
-            onToggle={(value) => onFilterChange(field, value)}
-            isGridView={isGridView}
-          />
-        ))}
+      <div className="relative min-h-0 flex-1">
+        <div className="pointer-events-auto h-full overflow-y-auto px-6 py-4 scrollbar-hide filter-panel-scroll">
+          {SECTIONS.map(({ field, title }) => (
+            <CollapsibleSection
+              key={field}
+              title={title}
+              values={facets[field]}
+              activeValues={activeFilters[field]}
+              onToggle={(value) => onFilterChange(field, value)}
+              isGridView={isGridView}
+            />
+          ))}
+        </div>
+        <div
+          className={cn(
+            "filter-panel-search-scrim",
+            isGridView
+              ? "filter-panel-search-scrim--light"
+              : "filter-panel-search-scrim--dark",
+          )}
+          aria-hidden
+        />
+        <div className="filter-panel-search-reserve" aria-hidden />
       </div>
     </aside>
   );
@@ -190,11 +316,11 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
         aria-expanded={isExpanded}
-        className={cn(panelRowGrid, 'cursor-pointer text-left')}
+        className={cn(panelRowGrid, "cursor-pointer text-left")}
       >
         <span className="font-bold">{title}</span>
         <span aria-hidden="true" className={panelControlCell}>
-          {isExpanded ? '↑' : '↓'}
+          {isExpanded ? "↑" : "↓"}
         </span>
       </button>
       {isExpanded && (
@@ -210,15 +336,9 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
                 aria-pressed={isActive}
                 className={filterValueClass(isActive, isGridView)}
               >
-                <span className={cn('min-w-0', isActive && 'font-bold')}>
-                  {value}
-                </span>
+                <span className="min-w-0">{formatMultiValueString(value)}</span>
                 <span className={panelControlCell}>
-                  {isActive && (
-                    <span aria-hidden="true" className="font-bold">
-                      ×
-                    </span>
-                  )}
+                  {isActive && <span aria-hidden="true">×</span>}
                 </span>
               </button>
             );

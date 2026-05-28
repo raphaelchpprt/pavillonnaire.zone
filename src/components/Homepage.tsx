@@ -1,45 +1,52 @@
-'use client';
+"use client";
 
-import { About } from '@/components/About';
-import { Instagram } from '@/components/Instagram';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { cn } from '@/utils';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { ABOUT_PATH, ROOT_PATH } from '@/paths';
-import { useMapBox } from '@/hooks/useMapBox';
-import { useEntries } from '@/hooks/useEntries';
-import { DetailsModal } from '@/components/DetailsModal';
-import { LegendFilter } from '@/components/LegendFilter';
-import { IndexButton } from '@/components/IndexButton';
-import { FilterPanel } from '@/components/FilterPanel';
-import { EntriesGrid } from '@/components/EntriesGrid';
-import { computeFacets } from '@/lib/facets';
-import { matchesFilterSelection } from '@/lib/normalize';
+import { About } from "@/components/About";
+import { Instagram } from "@/components/Instagram";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { ABOUT_PATH, ROOT_PATH } from "@/paths";
+import { useMapBox } from "@/hooks/useMapBox";
+import { useEntries } from "@/hooks/useEntries";
+import { DetailsModal } from "@/components/DetailsModal";
+import { LegendFilter } from "@/components/LegendFilter";
+import { IndexButton } from "@/components/IndexButton";
+import { FilterPanel } from "@/components/FilterPanel";
+import { EntriesGrid } from "@/components/EntriesGrid";
+import { computeFacets } from "@/lib/facets";
+import { matchesFilterSelection } from "@/lib/normalize";
+import { sortEntries } from "@/lib/sortEntries";
 import {
   parseFiltersFromUrl,
+  parseSortFromUrl,
   buildFilterUrl,
   buildFiltersResetUrl,
+  buildSortUrl,
   buildViewUrl,
   buildIndexOpenUrl,
   buildIndexCloseUrl,
   hasPanelFilters,
-} from '@/lib/filtersUrl';
-import { Entry, FilterField, ViewMode } from '@/types/entry';
-import { LayerType } from '@/constants/layers';
-import { MapboxGeoJSONFeature } from 'mapbox-gl';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+} from "@/lib/filtersUrl";
+import { Entry, FilterField, EntrySort, ViewMode } from "@/types/entry";
+import { LayerType } from "@/constants/layers";
+import { MapboxGeoJSONFeature } from "mapbox-gl";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 export default function Homepage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const view = searchParams.get('view');
-  const isAboutOpen = view === 'about';
-  const isGridView = view === 'grid';
-  const isIndexOpen = searchParams.get('index') === 'open';
+  const view = searchParams.get("view");
+  const isAboutOpen = view === "about";
+  const isGridView = view === "grid";
+  const isIndexOpen = searchParams.get("index") === "open";
 
   const activeFilters = useMemo(
     () => parseFiltersFromUrl(searchParams),
+    [searchParams],
+  );
+  const entrySort = useMemo(
+    () => parseSortFromUrl(searchParams),
     [searchParams],
   );
 
@@ -50,10 +57,12 @@ export default function Homepage() {
     clearSelectedLayers,
     selectedLayers,
     isMapLoaded,
-  } = useMapBox(activeFilters, !isGridView);
+  } = useMapBox(activeFilters);
 
   const hasActiveFilters =
-    hasPanelFilters(activeFilters) || selectedLayers.size > 0;
+    hasPanelFilters(activeFilters) ||
+    selectedLayers.size > 0 ||
+    entrySort !== "title";
 
   const { entries } = useEntries();
   const facets = useMemo(() => computeFacets(entries), [entries]);
@@ -61,28 +70,43 @@ export default function Homepage() {
   const filteredEntries = useMemo(() => {
     const { date, author, place, type } = activeFilters;
     const hasCategoryFilter = selectedLayers.size > 0;
-    const hasFieldFilter = date.length || author.length || place.length || type.length;
+    const hasFieldFilter =
+      date.length || author.length || place.length || type.length;
     if (!hasCategoryFilter && !hasFieldFilter) return entries;
     return entries.filter((entry) => {
-      if (hasCategoryFilter && !selectedLayers.has(entry.category)) return false;
-      if (date.length && (entry.year == null || !date.includes(String(entry.year)))) return false;
-      if (type.length && !matchesFilterSelection(entry.types, type)) return false;
-      if (place.length && !matchesFilterSelection(entry.places, place)) return false;
+      if (hasCategoryFilter && !selectedLayers.has(entry.category))
+        return false;
+      if (
+        date.length &&
+        (entry.year == null || !date.includes(String(entry.year)))
+      )
+        return false;
+      if (type.length && !matchesFilterSelection(entry.types, type))
+        return false;
+      if (place.length && !matchesFilterSelection(entry.places, place))
+        return false;
       if (author.length && !matchesFilterSelection(entry.authors, author))
         return false;
       return true;
     });
   }, [entries, activeFilters, selectedLayers]);
 
-  const [gridSelectedEntry, setGridSelectedEntry] = useState<Entry | undefined>();
+  const sortedEntries = useMemo(
+    () => sortEntries(filteredEntries, entrySort),
+    [filteredEntries, entrySort],
+  );
+
+  const [gridSelectedEntry, setGridSelectedEntry] = useState<
+    Entry | undefined
+  >();
 
   const gridFeature = useMemo((): MapboxGeoJSONFeature | undefined => {
     if (!gridSelectedEntry) return undefined;
     const e = gridSelectedEntry;
     return {
-      type: 'Feature',
+      type: "Feature",
       id: e.id,
-      geometry: { type: 'Point', coordinates: [0, 0] },
+      geometry: { type: "Point", coordinates: [0, 0] },
       properties: {
         title: e.title,
         type: e.type ?? null,
@@ -99,8 +123,8 @@ export default function Homepage() {
         link: e.link ?? null,
       },
       layer: {} as mapboxgl.Layer,
-      source: '',
-      sourceLayer: '',
+      source: "",
+      sourceLayer: "",
       state: {},
     } as unknown as MapboxGeoJSONFeature;
   }, [gridSelectedEntry]);
@@ -110,11 +134,17 @@ export default function Homepage() {
     const next = current.includes(value)
       ? current.filter((v) => v !== value)
       : [...current, value];
-    router.push(buildFilterUrl({ ...activeFilters, [field]: next }, searchParams));
+    router.push(
+      buildFilterUrl({ ...activeFilters, [field]: next }, searchParams),
+    );
   };
 
   const handleViewChange = (v: ViewMode) => {
     router.push(buildViewUrl(v, searchParams));
+  };
+
+  const handleEntrySortChange = (sort: EntrySort) => {
+    router.push(buildSortUrl(sort, searchParams));
   };
 
   const handleResetFilters = () => {
@@ -123,23 +153,25 @@ export default function Homepage() {
   };
 
   useEffect(() => {
-    document.documentElement.classList.toggle('index-grid-view', isGridView);
-    return () => document.documentElement.classList.remove('index-grid-view');
+    document.documentElement.classList.toggle("index-grid-view", isGridView);
+    return () => document.documentElement.classList.remove("index-grid-view");
   }, [isGridView]);
 
   useEffect(() => {
     if (!isAboutOpen) return;
     function hideAbout(e: KeyboardEvent) {
-      if (e.key === 'Escape') router.push(ROOT_PATH);
+      if (e.key === "Escape") router.push(ROOT_PATH);
     }
-    document.body.addEventListener('keydown', hideAbout);
-    return () => document.body.removeEventListener('keydown', hideAbout);
+    document.body.addEventListener("keydown", hideAbout);
+    return () => document.body.removeEventListener("keydown", hideAbout);
   }, [router, isAboutOpen]);
 
   const prevIsIndexOpen = useRef(false);
   useEffect(() => {
     if (prevIsIndexOpen.current && !isIndexOpen) {
-      (document.getElementById('index-button') as HTMLButtonElement | null)?.focus();
+      (
+        document.getElementById("index-button") as HTMLButtonElement | null
+      )?.focus();
     }
     prevIsIndexOpen.current = isIndexOpen;
   }, [isIndexOpen]);
@@ -147,43 +179,52 @@ export default function Homepage() {
   useEffect(() => {
     if (!isIndexOpen) return;
     function hidePanel(e: KeyboardEvent) {
-      if (e.key === 'Escape') router.push(buildIndexCloseUrl(searchParams));
+      if (e.key === "Escape") router.push(buildIndexCloseUrl(searchParams));
     }
-    document.body.addEventListener('keydown', hidePanel);
-    return () => document.body.removeEventListener('keydown', hidePanel);
+    document.body.addEventListener("keydown", hidePanel);
+    return () => document.body.removeEventListener("keydown", hidePanel);
   }, [router, isIndexOpen, searchParams]);
 
   useEffect(() => {
     function hideDetailsModal(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        document.getElementById('details-dialog')?.classList.add('hidden');
+      if (e.key === "Escape") {
+        document.getElementById("details-dialog")?.classList.add("hidden");
         setGridSelectedEntry(undefined);
       }
     }
 
-    document.body.addEventListener('keydown', hideDetailsModal);
+    document.body.addEventListener("keydown", hideDetailsModal);
     return () => {
-      document.body.removeEventListener('keydown', hideDetailsModal);
+      document.body.removeEventListener("keydown", hideDetailsModal);
     };
   }, []);
 
   useEffect(() => {
     if (!isGridView || !gridSelectedEntry) return;
-    document.getElementById('details-dialog')?.classList.remove('hidden');
+    document.getElementById("details-dialog")?.classList.remove("hidden");
   }, [isGridView, gridSelectedEntry]);
 
   return (
     <>
       <Link
         href={ABOUT_PATH}
-        onClick={isAboutOpen ? (e) => { e.preventDefault(); router.back(); } : undefined}
+        onClick={
+          isAboutOpen
+            ? (e) => {
+                e.preventDefault();
+                router.back();
+              }
+            : undefined
+        }
         className="group absolute left-6 top-6 z-30 flex h-7 w-7 cursor-pointer items-center justify-center border-[1.5px] border-white fill-current text-white mix-blend-difference"
       >
         <div className="h-2.5 w-2.5 rotate-45 transform bg-white transition duration-300 ease-in-out group-hover:rotate-0" />
       </Link>
 
       {!isAboutOpen && !isIndexOpen && (
-        <IndexButton onClick={() => router.push(buildIndexOpenUrl(searchParams))} />
+        <IndexButton
+          onClick={() => router.push(buildIndexOpenUrl(searchParams))}
+        />
       )}
 
       <FilterPanel
@@ -192,10 +233,12 @@ export default function Homepage() {
         facets={facets}
         activeFilters={activeFilters}
         onFilterChange={toggleFilter}
-        currentView={isGridView ? 'grid' : 'map'}
+        currentView={isGridView ? "grid" : "map"}
         onViewChange={handleViewChange}
         hasActiveFilters={hasActiveFilters}
         onReset={handleResetFilters}
+        entrySort={entrySort}
+        onEntrySortChange={handleEntrySortChange}
       />
 
       {isAboutOpen && (
@@ -208,10 +251,7 @@ export default function Homepage() {
       )}
 
       <div
-        className={cn(
-          'map-container relative h-full w-full',
-          isGridView && 'hidden',
-        )}
+        className="map-container relative h-full w-full"
         ref={mapContainerRef}
       />
 
@@ -219,7 +259,8 @@ export default function Homepage() {
         <LegendFilter
           selectedLayers={selectedLayers}
           onFilterChange={toggleLayer}
-          className={cn(isIndexOpen && 'max-md:hidden')}
+          surface={isGridView ? "grid" : "map"}
+          className={cn(isIndexOpen && "max-md:hidden")}
         />
       )}
 
@@ -232,19 +273,19 @@ export default function Homepage() {
         <>
           <div
             className={cn(
-              'index-header-fade pointer-events-none fixed inset-x-0 top-0 z-[15]',
-              isIndexOpen && 'max-md:hidden',
+              "index-header-fade pointer-events-none fixed inset-x-0 top-0 z-[15]",
+              isIndexOpen && "max-md:hidden",
             )}
             aria-hidden
           />
           <div
             className={cn(
-              'absolute inset-0 z-10 bg-white',
-              isIndexOpen && 'max-md:hidden',
+              "absolute inset-0 z-10 bg-white",
+              isIndexOpen && "max-md:hidden",
             )}
           >
             <EntriesGrid
-              entries={filteredEntries}
+              entries={sortedEntries}
               selectedEntryId={gridSelectedEntry?.id}
               onSelect={(entry) => {
                 setGridSelectedEntry(entry);

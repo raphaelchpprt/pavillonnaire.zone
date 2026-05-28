@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { cn, formatTypeString } from '@/utils';
-import { ComponentProps, FC } from 'react';
+import { cn, formatTypeString } from "@/utils";
+import { formatMultiValueString } from "@/lib/normalize";
+import { ComponentProps, FC } from "react";
 
-function Text({ children, className }: ComponentProps<'p'>) {
-  return <p className={cn('text-center text-sm', className)}>{children}</p>;
+function Text({ children, className }: ComponentProps<"p">) {
+  return <p className={cn("text-center text-sm", className)}>{children}</p>;
 }
 
 type TooltipProps = {
-  feature: mapboxgl.MapboxGeoJSONFeature['state'];
+  feature: mapboxgl.MapboxGeoJSONFeature["state"];
 };
 
 export const Tooltip: FC<TooltipProps> = ({ feature }) => {
@@ -25,13 +26,13 @@ export const Tooltip: FC<TooltipProps> = ({ feature }) => {
         {title}
       </h3>
       <Text className="italic lowercase">{types}</Text>
-      <Text>{author}</Text>
-      <Text>{director}</Text>
-      <Text>{artist}</Text>
-      <Text>{editor}</Text>
-      <Text>{album}</Text>
+      <Text>{formatMultiValueString(author)}</Text>
+      <Text>{formatMultiValueString(director)}</Text>
+      <Text>{formatMultiValueString(artist)}</Text>
+      <Text>{formatMultiValueString(editor)}</Text>
+      <Text>{formatMultiValueString(album)}</Text>
       <Text>{year}</Text>
-      <Text>{place}</Text>
+      <Text>{formatMultiValueString(place)}</Text>
     </div>
   );
 };

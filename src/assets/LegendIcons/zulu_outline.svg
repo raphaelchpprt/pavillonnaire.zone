@@ -4,9 +4,9 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50"
 	style="enable-background:new 0 0 50 50;" xml:space="preserve">
 	<g id="zulu">
-		<path d="M0,0h50v50H0V0z" fill="none" stroke="white" stroke-width="5" />
-		<path class="st1" d="M0,0l25,25L0,50V0z" fill="none" stroke="white" stroke-width="3" />
-		<path class="st0" d="M0,50l25-25l25,25H0z" fill="none" stroke="white" stroke-width="3" />
-		<path class="st1" d="M50,50L25,25L50,0V50z" fill="none" stroke="white" stroke-width="3" />
+		<path d="M0,0h50v50H0V0z" fill="none" stroke="currentColor" stroke-width="5" />
+		<path class="st1" d="M0,0l25,25L0,50V0z" fill="none" stroke="currentColor" stroke-width="3" />
+		<path class="st0" d="M0,50l25-25l25,25H0z" fill="none" stroke="currentColor" stroke-width="3" />
+		<path class="st1" d="M50,50L25,25L50,0V50z" fill="none" stroke="currentColor" stroke-width="3" />
 	</g>
 </svg>

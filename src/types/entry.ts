@@ -1,4 +1,4 @@
-import type { LayerType } from '@/constants/layers';
+import type { LayerType } from "@/constants/layers";
 
 export interface Entry {
   id: string;
@@ -28,24 +28,33 @@ export interface Entry {
 }
 
 export const AUTHOR_FIELDS = [
-  'author',
-  'director',
-  'artist',
-  'editor',
-  'album',
+  "author",
+  "director",
+  "artist",
+  "editor",
+  "album",
 ] as const;
 export type AuthorField = (typeof AUTHOR_FIELDS)[number];
 
 /** Sous-ensemble utilisé pour le filtre « Auteur.ices » (hors éditeur / album). */
 export const AUTHOR_FILTER_FIELDS = [
-  'author',
-  'director',
-  'artist',
+  "author",
+  "director",
+  "artist",
 ] as const satisfies readonly AuthorField[];
 
-export type FilterField = 'date' | 'author' | 'place' | 'type';
+export type FilterField = "date" | "author" | "place" | "type";
 
-export type ViewMode = 'map' | 'grid';
+export type ViewMode = "map" | "grid";
+
+/** Tri de l’index grille. */
+export type EntrySort = "title" | "date-asc" | "date-desc";
+
+export const ENTRY_SORT_VALUES = [
+  "title",
+  "date-asc",
+  "date-desc",
+] as const satisfies readonly EntrySort[];
 
 export interface ActiveFilters {
   date: string[];

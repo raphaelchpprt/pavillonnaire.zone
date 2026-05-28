@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
-import { MAPBOX_DEFAULT_DATASET_ID_TO_LAYER } from '@/constants/mapboxDatasets';
-import { isLayerType, LayerType } from '@/constants/layers';
+import { NextResponse } from "next/server";
+import { MAPBOX_DEFAULT_DATASET_ID_TO_LAYER } from "@/constants/mapboxDatasets";
+import { isLayerType, LayerType } from "@/constants/layers";
 import {
   dedupeTokens,
   parseImagesProperty,
   parseMultiValue,
-} from '@/lib/normalize';
-import { AUTHOR_FILTER_FIELDS, Entry } from '@/types/entry';
+} from "@/lib/normalize";
+import { AUTHOR_FILTER_FIELDS, Entry } from "@/types/entry";
 
-export const revalidate = 3600;
+/** Données Mapbox : route dynamique (env + fetch), pas de cache statique. */
+export const dynamic = "force-dynamic";
 
 interface MapboxFeature {
   id: string;
@@ -19,45 +20,46 @@ interface MapboxFeaturesResponse {
   features: MapboxFeature[];
 }
 
-function strProp(record: Record<string, unknown>, key: string): string | undefined {
+function strProp(
+  record: Record<string, unknown>,
+  key: string,
+): string | undefined {
   const v = record[key];
-  return typeof v === 'string' && v.trim().length > 0 ? v : undefined;
+  return typeof v === "string" && v.trim().length > 0 ? v : undefined;
 }
 
 function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   const p = feature.properties;
 
   const authors = dedupeTokens(
-    AUTHOR_FILTER_FIELDS.map((f) => strProp(p, f)).filter(
-      (v): v is string => v !== undefined,
-    ),
+    AUTHOR_FILTER_FIELDS.flatMap((f) => parseMultiValue(strProp(p, f))),
   );
 
-  const typeRaw = strProp(p, 'type');
-  const placeRaw = strProp(p, 'place');
+  const typeRaw = strProp(p, "type");
+  const placeRaw = strProp(p, "place");
 
   const images = parseImagesProperty(p);
-  const image = strProp(p, 'image') ?? images?.[0];
+  const image = strProp(p, "image") ?? images?.[0];
 
   return {
     id: feature.id,
     category,
-    title: typeof p.title === 'string' ? p.title : '',
+    title: typeof p.title === "string" ? p.title : "",
     type: typeRaw,
     types: parseMultiValue(typeRaw),
     place: placeRaw,
     places: parseMultiValue(placeRaw),
     authors,
-    author: strProp(p, 'author'),
-    director: strProp(p, 'director'),
-    artist: strProp(p, 'artist'),
-    album: strProp(p, 'album'),
-    editor: strProp(p, 'editor'),
-    year: typeof p.year === 'number' ? p.year : undefined,
+    author: strProp(p, "author"),
+    director: strProp(p, "director"),
+    artist: strProp(p, "artist"),
+    album: strProp(p, "album"),
+    editor: strProp(p, "editor"),
+    year: typeof p.year === "number" ? p.year : undefined,
     image,
     images,
-    abstract: typeof p.abstract === 'string' ? p.abstract : undefined,
-    link: typeof p.link === 'string' ? p.link : undefined,
+    abstract: typeof p.abstract === "string" ? p.abstract : undefined,
+    link: typeof p.link === "string" ? p.link : undefined,
   };
 }
 
@@ -85,9 +87,9 @@ async function fetchDataset(
     const url = new URL(
       `https://api.mapbox.com/datasets/v1/${user}/${datasetId}/features`,
     );
-    url.searchParams.set('access_token', token);
-    url.searchParams.set('limit', '100');
-    if (start) url.searchParams.set('start', start);
+    url.searchParams.set("access_token", token);
+    url.searchParams.set("limit", "100");
+    if (start) url.searchParams.set("start", start);
 
     const res = await fetch(url.toString());
     if (!res.ok) throw new Error(`Dataset ${datasetId}: HTTP ${res.status}`);
@@ -107,12 +109,16 @@ async function fetchDataset(
 export async function GET() {
   const token = process.env.MAPBOX_SECRET_TOKEN;
   const user = process.env.MAPBOX_USER;
-  const datasetIds = process.env.MAPBOX_DATASET_IDS?.split(',').map((s) => s.trim());
-  const datasetNames = process.env.MAPBOX_DATASET_NAMES?.split(',').map((s) => s.trim());
+  const datasetIds = process.env.MAPBOX_DATASET_IDS?.split(",").map((s) =>
+    s.trim(),
+  );
+  const datasetNames = process.env.MAPBOX_DATASET_NAMES?.split(",").map((s) =>
+    s.trim(),
+  );
 
   if (!token || !user || !datasetIds?.length) {
     return NextResponse.json(
-      { error: 'Missing Mapbox configuration' },
+      { error: "Missing Mapbox configuration" },
       { status: 500 },
     );
   }
@@ -126,13 +132,18 @@ export async function GET() {
     const result = results[i];
     const id = datasetIds[i];
     const category = resolveDatasetCategory(i, datasetIds, datasetNames);
-    if (result.status === 'rejected') {
-      console.error(`Failed to fetch dataset ${category ?? id}:`, result.reason);
+    if (result.status === "rejected") {
+      console.error(
+        `Failed to fetch dataset ${category ?? id}:`,
+        result.reason,
+      );
       continue;
     }
     if (!category || !isLayerType(category)) {
       console.error(
-        `Unknown category for dataset "${id}" (${datasetNames?.[i] ?? 'no MAPBOX_DATASET_NAMES entry'}), skipping ${result.value.length} features`,
+        `Unknown category for dataset "${id}" (${
+          datasetNames?.[i] ?? "no MAPBOX_DATASET_NAMES entry"
+        }), skipping ${result.value.length} features`,
       );
       continue;
     }

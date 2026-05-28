@@ -5,6 +5,7 @@ import { Entry } from "@/types/entry";
 import { LAYERS_CONFIG } from "@/constants/layers";
 import { cn } from "@/utils";
 import { EntryThumbnail } from "@/components/EntryThumbnail";
+import { GridEntryTitle } from "@/components/GridEntryTitle";
 
 type EntriesGridProps = {
   entries: Entry[];
@@ -20,7 +21,7 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
   onSelect,
 }) => {
   return (
-    <div className="index-content-gutter index-grid-scroll grid h-full w-full grid-cols-2 content-start items-end gap-x-6 gap-y-8 overflow-y-auto pb-8 scrollbar-hide sm:grid-cols-3 lg:grid-cols-5">
+    <div className="index-content-gutter index-grid-scroll grid h-full w-full grid-cols-2 content-start gap-x-6 gap-y-8 overflow-y-auto pb-8 scrollbar-hide sm:grid-cols-3 lg:grid-cols-5">
       {entries.map((entry) => {
         const isActive = entry.id === selectedEntryId;
         const Icon = LAYERS_BY_ID.get(entry.category)?.Icon;
@@ -30,17 +31,18 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
             key={entry.id}
             type="button"
             onClick={() => onSelect(entry)}
+            title={entry.title}
             className={cn(
-              "min-w-0 cursor-pointer text-left transition-[filter] duration-200",
+              "w-full min-w-0 cursor-pointer text-left transition-[filter] duration-200",
               !isActive && "grayscale hover:grayscale-0",
             )}
           >
-            <EntryThumbnail entry={entry} alt={entry.title} />
-            <div className="flex min-w-0 items-center gap-1.5 pt-1.5">
-              <span className="flex-1 font-serif text-sm leading-tight">
-                {entry.title}
-              </span>
-              {Icon && <Icon className="h-5 w-5 shrink-0" />}
+            <div className="index-entry-media">
+              <EntryThumbnail entry={entry} alt={entry.title} />
+            </div>
+            <div className="index-entry-caption pt-1.5">
+              <GridEntryTitle title={entry.title} />
+              {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden />}
             </div>
           </button>
         );

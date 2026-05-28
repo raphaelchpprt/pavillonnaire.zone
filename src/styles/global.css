@@ -8,7 +8,11 @@
   --index-content-gutter-right: 1.5rem;
   /* left-6 + icône légende (28px) + tampon — évite le chevauchement avec le label hover */
   --index-content-gutter-left: 4.5rem;
-  --index-header-fade-height: 5rem;
+  --index-header-fade-height: 6rem;
+  /** Zone réservée en bas du panneau filtres (géocodeur Mapbox + marges). */
+  --map-bottom-controls-reserve: calc(1.5rem + 28px + 0.125rem);
+  /** Fade bas filtres : collé au search. */
+  --filter-panel-fade-height: 2.75rem;
 }
 
 @media (min-width: 768px) {
@@ -33,7 +37,11 @@
     background: linear-gradient(
       to bottom,
       #ffffff 0%,
-      #ffffff 55%,
+      #ffffff 28%,
+      rgb(255 255 255 / 0.92) 42%,
+      rgb(255 255 255 / 0.72) 58%,
+      rgb(255 255 255 / 0.42) 74%,
+      rgb(255 255 255 / 0.14) 88%,
       rgb(255 255 255 / 0) 100%
     );
   }
@@ -49,6 +57,163 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Grille index : zone image hauteur fixe, images calées en bas */
+  .index-entry-media {
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    justify-content: center;
+    height: clamp(5.5rem, 28vw, 9.5rem);
+  }
+
+  @media (min-width: 640px) {
+    .index-entry-media {
+      height: clamp(6rem, 18vw, 9rem);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .index-entry-media {
+      height: clamp(5.5rem, 12vw, 8rem);
+    }
+  }
+
+  .index-entry-media img {
+    max-height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: bottom;
+  }
+
+  /* Grille index : caption flex (min-w-0) pour que le titre ne passe pas sous le drapeau */
+  .index-entry-caption {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 0.375rem;
+    height: calc(0.875rem * 1.375 * 2);
+  }
+
+  .index-entry-title {
+    display: block;
+    width: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+    line-height: 1.375;
+  }
+
+  .index-entry-title-line {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .index-entry-title-line--ellipsis {
+    text-overflow: ellipsis;
+  }
+
+  .filter-panel-scroll {
+    padding-bottom: var(--map-bottom-controls-reserve);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 calc(100% - var(--map-bottom-controls-reserve) - var(--filter-panel-fade-height)),
+      rgb(0 0 0 / 0.86)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.88
+        ),
+      rgb(0 0 0 / 0.58)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.74
+        ),
+      rgb(0 0 0 / 0.28)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.58
+        ),
+      rgb(0 0 0 / 0.08)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.42
+        ),
+      transparent calc(100% - var(--map-bottom-controls-reserve)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 calc(100% - var(--map-bottom-controls-reserve) - var(--filter-panel-fade-height)),
+      rgb(0 0 0 / 0.86)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.88
+        ),
+      rgb(0 0 0 / 0.58)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.74
+        ),
+      rgb(0 0 0 / 0.28)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.58
+        ),
+      rgb(0 0 0 / 0.08)
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height) * 0.42
+        ),
+      transparent calc(100% - var(--map-bottom-controls-reserve)),
+      transparent 100%
+    );
+  }
+
+  .filter-panel-search-scrim {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 1;
+    height: calc(var(--map-bottom-controls-reserve) + var(--filter-panel-fade-height));
+    pointer-events: none;
+  }
+
+  .filter-panel-search-scrim--light {
+    background: linear-gradient(
+      to top,
+      #ffffff 0%,
+      #ffffff 22%,
+      rgb(255 255 255 / 0.94) 38%,
+      rgb(255 255 255 / 0.78) 54%,
+      rgb(255 255 255 / 0.48) 70%,
+      rgb(255 255 255 / 0.2) 84%,
+      rgb(255 255 255 / 0) 100%
+    );
+  }
+
+  .filter-panel-search-scrim--dark {
+    background: linear-gradient(
+      to top,
+      #000000 0%,
+      #000000 22%,
+      rgb(0 0 0 / 0.94) 38%,
+      rgb(0 0 0 / 0.78) 54%,
+      rgb(0 0 0 / 0.48) 70%,
+      rgb(0 0 0 / 0.2) 84%,
+      rgb(0 0 0 / 0) 100%
+    );
+  }
+
+  .filter-panel-search-reserve {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: var(--map-bottom-controls-reserve);
+    pointer-events: none;
   }
 }
 
@@ -153,11 +318,11 @@ body {
   display: none !important;
 }
 
-/* prevent overlay between title and map controls */
+/* Contrôles carte : pas de mix-blend (couleurs roses / UI lisibles) */
 .mapboxgl-ctrl-top-right,
 .mapboxgl-ctrl-bottom-left {
   z-index: 20;
-  mix-blend-mode: difference;
+  mix-blend-mode: normal;
 }
 
 .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-group {
@@ -182,7 +347,8 @@ body {
 }
 
 .mapboxgl-ctrl-group button:hover {
-  background-color: white !important;
+  background-color: rgb(251 113 133) !important;
+  border-color: rgb(251 113 133) !important;
 }
 
 
@@ -194,6 +360,12 @@ body {
   background-color: transparent;
   border: 1.5px solid white;
   border-radius: 0;
+  box-shadow: none;
+}
+
+.mapboxgl-ctrl-geocoder,
+.mapboxgl-ctrl-geocoder .suggestions {
+  box-shadow: none !important;
 }
 
 svg.mapboxgl-ctrl-geocoder--icon {
@@ -227,6 +399,76 @@ svg.mapboxgl-ctrl-geocoder--icon {
 
 .mapboxgl-ctrl-geocoder--button {
   background: black !important;
+}
+
+html.index-grid-view .map-container {
+  position: absolute;
+  inset: 0;
+  /* Au-dessus du panneau filtres (z-40) pour garder le search visible ; clics filtres via pointer-events-none */
+  z-index: 45;
+  pointer-events: none;
+  background: transparent;
+}
+
+html.index-grid-view .mapboxgl-map {
+  background: transparent !important;
+}
+
+html.index-grid-view .mapboxgl-canvas-container,
+html.index-grid-view .mapboxgl-ctrl-bottom-left {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html.index-grid-view .mapboxgl-ctrl-bottom-right {
+  visibility: visible !important;
+  pointer-events: auto;
+  mix-blend-mode: normal;
+  filter: none;
+  z-index: 50;
+}
+
+html.index-grid-view .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-geocoder {
+  border-color: #000;
+  background-color: #fff;
+  box-shadow: none !important;
+  filter: none;
+}
+
+html.index-grid-view .mapboxgl-ctrl-geocoder .suggestions,
+html.index-grid-view .mapboxgl-ctrl-geocoder .suggestions-wrapper {
+  box-shadow: none !important;
+  filter: none;
+}
+
+html.index-grid-view .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed .suggestions-wrapper {
+  display: none;
+}
+
+html.index-grid-view svg.mapboxgl-ctrl-geocoder--icon {
+  fill: #000;
+}
+
+html.index-grid-view .mapboxgl-ctrl-geocoder--input,
+html.index-grid-view .mapboxgl-ctrl-geocoder--input:focus {
+  color: #000 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+html.index-grid-view .mapboxgl-ctrl-geocoder--button {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none;
+}
+
+html.index-grid-view .mapboxgl-ctrl-geocoder--button:hover {
+  background: #000 !important;
+}
+
+html.index-grid-view .mapboxgl-ctrl-geocoder--button:hover svg.mapboxgl-ctrl-geocoder--icon {
+  fill: #fff;
 }
 
 .mapboxgl-ctrl-bottom-right {

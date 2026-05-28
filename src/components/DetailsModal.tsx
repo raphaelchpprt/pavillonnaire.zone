@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { MapboxGeoJSONFeature } from 'mapbox-gl';
-import { ComponentProps, PropsWithChildren, FC } from 'react';
-import { cn, formatTypeString } from '@/utils';
-import { ImageCarousel } from './ImageCarousel';
+import { MapboxGeoJSONFeature } from "mapbox-gl";
+import { ComponentProps, PropsWithChildren, FC } from "react";
+import { cn, formatTypeString } from "@/utils";
+import { formatMultiValueString } from "@/lib/normalize";
+import { ImageCarousel } from "./ImageCarousel";
 
-function Text({ children, className }: ComponentProps<'p'>) {
-  return <p className={cn('text-center', className)}>{children}</p>;
+function Text({ children, className }: ComponentProps<"p">) {
+  return <p className={cn("text-center", className)}>{children}</p>;
 }
 
 type DetailsModalProps = PropsWithChildren<{
@@ -18,7 +19,7 @@ export const DetailsModal: FC<DetailsModalProps> = ({ feature, onClose }) => {
   if (!feature) return null;
 
   function toggleAside() {
-    document.getElementById('details-dialog')?.classList.add('hidden');
+    document.getElementById("details-dialog")?.classList.add("hidden");
     onClose?.();
   }
 
@@ -40,7 +41,7 @@ export const DetailsModal: FC<DetailsModalProps> = ({ feature, onClose }) => {
 
   let images: string[] | null = null;
   if (imagesRaw) {
-    if (typeof imagesRaw === 'string') {
+    if (typeof imagesRaw === "string") {
       try {
         images = JSON.parse(imagesRaw);
       } catch {
@@ -80,13 +81,13 @@ export const DetailsModal: FC<DetailsModalProps> = ({ feature, onClose }) => {
         </h3>
 
         {types && <Text className="italic lowercase">{types}</Text>}
-        {author && <Text>{author}</Text>}
-        {director && <Text>{director}</Text>}
-        {artist && <Text>{artist}</Text>}
-        {album && <Text>{album}</Text>}
-        {editor && <Text>{editor}</Text>}
+        {author && <Text>{formatMultiValueString(author)}</Text>}
+        {director && <Text>{formatMultiValueString(director)}</Text>}
+        {artist && <Text>{formatMultiValueString(artist)}</Text>}
+        {album && <Text>{formatMultiValueString(album)}</Text>}
+        {editor && <Text>{formatMultiValueString(editor)}</Text>}
         {year && <Text>{year}</Text>}
-        {place && <Text>{place}</Text>}
+        {place && <Text>{formatMultiValueString(place)}</Text>}
         {link && <LinkItem linkTo={link} />}
         {abstract && <Text className="text-justify text-sm">{abstract}</Text>}
       </div>
