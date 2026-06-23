@@ -253,16 +253,16 @@ export default function Homepage() {
       <div
         className="map-container relative h-full w-full"
         ref={mapContainerRef}
-      />
-
-      {!isAboutOpen && (isMapLoaded || isGridView) && (
-        <LegendFilter
-          selectedLayers={selectedLayers}
-          onFilterChange={toggleLayer}
-          surface={isGridView ? "grid" : "map"}
-          className={cn(isIndexOpen && "max-md:hidden")}
-        />
-      )}
+      >
+        {!isAboutOpen && (isMapLoaded || isGridView) && (
+          <LegendFilter
+            selectedLayers={selectedLayers}
+            onFilterChange={toggleLayer}
+            surface={isGridView ? "grid" : "map"}
+            className={cn(isIndexOpen && "max-md:hidden")}
+          />
+        )}
+      </div>
 
       <DetailsModal
         feature={isGridView ? gridFeature : feature}
