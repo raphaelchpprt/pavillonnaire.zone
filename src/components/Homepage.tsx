@@ -14,6 +14,7 @@ import { LegendFilter } from "@/components/LegendFilter";
 import { IndexButton } from "@/components/IndexButton";
 import { FilterPanel } from "@/components/FilterPanel";
 import { EntriesGrid } from "@/components/EntriesGrid";
+import { GridStatus } from "@/components/GridStatus";
 import { computeFacets } from "@/lib/facets";
 import { matchesFilterSelection } from "@/lib/normalize";
 import { sortEntries } from "@/lib/sortEntries";
@@ -64,7 +65,7 @@ export default function Homepage() {
     selectedLayers.size > 0 ||
     entrySort !== "title";
 
-  const { entries } = useEntries();
+  const { entries, isLoading, error, reload } = useEntries();
   const facets = useMemo(() => computeFacets(entries), [entries]);
 
   const filteredEntries = useMemo(() => {
@@ -284,13 +285,25 @@ export default function Homepage() {
               isIndexOpen && "max-md:hidden",
             )}
           >
-            <EntriesGrid
-              entries={sortedEntries}
-              selectedEntryId={gridSelectedEntry?.id}
-              onSelect={(entry) => {
-                setGridSelectedEntry(entry);
-              }}
-            />
+            {error ? (
+              <GridStatus kind="error" onRetry={reload} />
+            ) : isLoading ? (
+              <GridStatus kind="loading" />
+            ) : sortedEntries.length === 0 ? (
+              entries.length === 0 ? (
+                <GridStatus kind="empty" />
+              ) : (
+                <GridStatus kind="empty-filtered" onReset={handleResetFilters} />
+              )
+            ) : (
+              <EntriesGrid
+                entries={sortedEntries}
+                selectedEntryId={gridSelectedEntry?.id}
+                onSelect={(entry) => {
+                  setGridSelectedEntry(entry);
+                }}
+              />
+            )}
           </div>
         </>
       )}

@@ -1,8 +1,6 @@
 import { hyphenateSync } from "hyphen/fr";
 
 const ELLIPSIS = "…";
-/** Hyphenate a lone word only past this length (avoids "L-/ot"). */
-const MIN_HYPHEN_WORD_LENGTH = 8;
 /** Min length to optionally hyphenate a lone L1 word into L2. */
 const MIN_OPTIONAL_HYPHEN_LENGTH = 12;
 
@@ -159,39 +157,38 @@ export function splitGridTitle(
     return measure.scrollWidth <= maxWidth + 1;
   };
 
-  if (fits(text)) {
-    cleanup();
-    return { line1: text, line2: "" };
-  }
-
-  const words = text.split(/\s+/).filter(Boolean);
-  const line1Words: string[] = [];
-  let wordIndex = 0;
-
-  for (; wordIndex < words.length; wordIndex += 1) {
-    const word = words[wordIndex];
-
-    if (line1Words.length === 0 && !fits(word)) {
-      const split = splitWordForLine1(word, fits);
-      const rest = [split.rest, ...words.slice(wordIndex + 1)]
-        .filter(Boolean)
-        .join(" ");
-      const result = buildLines(split.line1, rest, fits);
-      cleanup();
-      return result;
+  try {
+    if (fits(text)) {
+      return { line1: text, line2: "" };
     }
 
-    const candidate = [...line1Words, word].join(" ");
-    if (!fits(candidate)) break;
-    line1Words.push(word);
+    const words = text.split(/\s+/).filter(Boolean);
+    const line1Words: string[] = [];
+    let wordIndex = 0;
+
+    for (; wordIndex < words.length; wordIndex += 1) {
+      const word = words[wordIndex];
+
+      if (line1Words.length === 0 && !fits(word)) {
+        const split = splitWordForLine1(word, fits);
+        const rest = [split.rest, ...words.slice(wordIndex + 1)]
+          .filter(Boolean)
+          .join(" ");
+        return buildLines(split.line1, rest, fits);
+      }
+
+      const candidate = [...line1Words, word].join(" ");
+      if (!fits(candidate)) break;
+      line1Words.push(word);
+    }
+
+    let line1 = line1Words.join(" ");
+    let rest = words.slice(wordIndex).join(" ");
+
+    ({ line1, rest } = maybeHyphenateLastWordOnLine1(line1, rest, fits));
+
+    return buildLines(line1, rest, fits);
+  } finally {
+    cleanup();
   }
-
-  let line1 = line1Words.join(" ");
-  let rest = words.slice(wordIndex).join(" ");
-
-  ({ line1, rest } = maybeHyphenateLastWordOnLine1(line1, rest, fits));
-
-  const result = buildLines(line1, rest, fits);
-  cleanup();
-  return result;
 }

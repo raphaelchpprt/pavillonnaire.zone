@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Entry } from "@/types/entry";
 import { getEntryThumbnailUrls } from "@/lib/entryMedia";
 
@@ -13,15 +13,24 @@ type EntryThumbnailProps = {
 export const EntryThumbnail: FC<EntryThumbnailProps> = ({ entry, alt }) => {
   const urls = useMemo(() => getEntryThumbnailUrls(entry), [entry]);
   const [urlIndex, setUrlIndex] = useState(0);
+  const loggedExhaustion = useRef(false);
 
   useEffect(() => {
     setUrlIndex(0);
+    loggedExhaustion.current = false;
   }, [entry.id, urls]);
 
   const src = urls[urlIndex];
 
   if (!src) {
-    return <div className="h-full w-full bg-gray-100" />;
+    // No usable media: a quiet dashed frame keeps the grid rhythm without
+    // pretending an image is loading. Decorative — the title sits in the caption.
+    return (
+      <div
+        className="h-full w-full border-[1.5px] border-dashed border-gray-200"
+        aria-hidden
+      />
+    );
   }
 
   return (
@@ -34,7 +43,17 @@ export const EntryThumbnail: FC<EntryThumbnailProps> = ({ entry, alt }) => {
       sizes="(max-width: 1023px) 28vw, (max-width: 1279px) 18vw, 12vw"
       className="block max-h-full w-full"
       onError={() => {
-        setUrlIndex((i) => i + 1);
+        setUrlIndex((i) => {
+          const next = i + 1;
+          if (next >= urls.length && !loggedExhaustion.current) {
+            loggedExhaustion.current = true;
+            console.error(
+              `EntryThumbnail: all image URLs failed for entry ${entry.id}`,
+              urls,
+            );
+          }
+          return next;
+        });
       }}
     />
   );

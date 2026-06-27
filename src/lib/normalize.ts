@@ -51,6 +51,20 @@ export function dedupeTokens(tokens: string[]): string[] {
   return Array.from(seen.values());
 }
 
+/** Coerce a Mapbox `year` property (number or numeric string) to a number. */
+export function parseYear(value: unknown): number | undefined {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "") return undefined;
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+}
+
 export function parseImagesProperty(
   record: Record<string, unknown>,
 ): string[] | undefined {
@@ -62,6 +76,7 @@ export function parseImagesProperty(
       const parsed: unknown = JSON.parse(raw);
       if (Array.isArray(parsed)) list = parsed;
     } catch {
+      console.warn("parseImagesProperty: malformed images JSON, ignoring:", raw);
       return undefined;
     }
   } else if (Array.isArray(raw)) {
@@ -86,7 +101,9 @@ export function matchesFilterSelection(
   return selected.some((value) => entryKeys.has(canonicalKey(value)));
 }
 
-/** Mapbox expression: multi-value text field (` ; `) contains a selection. */
+/** Mapbox expression matching a multi-value text field against a selection.
+ *  Handles three shapes per value: exact equality, the padded ` ; ` separator,
+ *  and the bare `;` separator (data sometimes omits the surrounding spaces). */
 export function buildMapboxMultiValueFilter(
   property: string,
   selected: string[],

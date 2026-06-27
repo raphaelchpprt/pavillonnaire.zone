@@ -5,13 +5,15 @@ import {
   dedupeTokens,
   parseImagesProperty,
   parseMultiValue,
+  parseYear,
 } from "@/lib/normalize";
 import { AUTHOR_FILTER_FIELDS, Entry } from "@/types/entry";
 
 export const dynamic = "force-dynamic";
 
 interface MapboxFeature {
-  id: string;
+  /** Mapbox returns ids as either string or number depending on the source. */
+  id: string | number;
   properties: Record<string, unknown>;
 }
 
@@ -41,7 +43,7 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   const image = strProp(p, "image") ?? images?.[0];
 
   return {
-    id: feature.id,
+    id: String(feature.id),
     category,
     title: typeof p.title === "string" ? p.title : "",
     type: typeRaw,
@@ -54,7 +56,7 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
     artist: strProp(p, "artist"),
     album: strProp(p, "album"),
     editor: strProp(p, "editor"),
-    year: typeof p.year === "number" ? p.year : undefined,
+    year: parseYear(p.year),
     image,
     images,
     abstract: typeof p.abstract === "string" ? p.abstract : undefined,
@@ -94,11 +96,15 @@ async function fetchDataset(
     if (!res.ok) throw new Error(`Dataset ${datasetId}: HTTP ${res.status}`);
 
     const data: MapboxFeaturesResponse = await res.json();
+    if (!Array.isArray(data.features)) {
+      throw new Error(`Dataset ${datasetId}: malformed response (no features)`);
+    }
     features.push(...data.features);
 
+    // Mapbox paginates with a cursor; a full page (== limit) means there is more.
     start =
       data.features.length === 100
-        ? data.features[data.features.length - 1].id
+        ? String(data.features[data.features.length - 1].id)
         : undefined;
   } while (start);
 
@@ -149,6 +155,17 @@ export async function GET() {
     for (const feature of result.value) {
       entries.push(normalizeEntry(feature, category));
     }
+  }
+
+  // Every dataset failed: surface a real error instead of a misleading empty
+  // result, so the client can tell "load failed" from "legitimately empty".
+  const allFailed =
+    results.length > 0 && results.every((r) => r.status === "rejected");
+  if (allFailed) {
+    return NextResponse.json(
+      { error: "Failed to fetch any dataset" },
+      { status: 502 },
+    );
   }
 
   return NextResponse.json({ entries });
