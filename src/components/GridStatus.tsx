@@ -8,10 +8,8 @@ type GridStatusProps =
   | { kind: "empty" }
   | { kind: "empty-filtered"; onReset: () => void };
 
-const YOSTER = { fontFamily: "Yoster-Island" } as const;
-
 const ACTION_CLASS =
-  "border-[1.5px] border-black px-4 py-1.5 text-xs uppercase tracking-[0.15em] transition-colors duration-200 hover:border-rose-400 hover:bg-rose-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-400";
+  "border-[1.5px] border-black px-4 py-1.5 text-xs tracking-[0.15em] transition-colors duration-200 hover:border-rose-400 hover:bg-rose-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-400";
 
 /** Loading / error / empty states for the index grid, in the site's
  *  black-and-white brutalist register with the single rose accent. */
@@ -19,21 +17,13 @@ export const GridStatus: FC<GridStatusProps> = (props) => {
   return (
     <div className="index-content-gutter index-grid-scroll flex h-full w-full flex-col items-center justify-center gap-4 pb-8 text-center">
       {props.kind === "loading" && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="flex flex-col items-center gap-3"
-        >
-          <span
-            aria-hidden
-            className="h-2 w-2 animate-pulse bg-rose-400 motion-reduce:animate-none"
+        <div role="status" aria-label="Chargement de l’index">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/icon-maison-transp.gif"
+            alt=""
+            className="h-24 w-24 object-contain"
           />
-          <span
-            style={YOSTER}
-            className="text-xs uppercase tracking-[0.2em] text-gray-500"
-          >
-            Chargement de l’index
-          </span>
         </div>
       )}
 
