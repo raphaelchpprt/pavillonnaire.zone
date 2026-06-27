@@ -212,7 +212,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
           </div>
           {isGridView && (
             <div
-              className="flex flex-wrap items-center gap-1.5 border-b border-black pb-6 pt-1"
+              className="flex flex-wrap items-center gap-1.5 pb-1 pt-1"
               role="group"
               aria-label="Tri et réinitialisation"
             >
@@ -259,7 +259,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
       </header>
 
       <div className="relative min-h-0 flex-1">
-        <div className="pointer-events-auto h-full overflow-y-auto px-6 py-4 scrollbar-hide filter-panel-scroll">
+        <div className="pointer-events-auto h-full overflow-y-auto px-6 pb-4 pt-2 scrollbar-hide filter-panel-scroll">
           <div className={dropdownAlignBlock}>
             {SECTIONS.map(({ field, title }) => (
               <CollapsibleSection
