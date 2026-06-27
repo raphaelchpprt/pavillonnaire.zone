@@ -167,7 +167,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
           </div>
           <div
             className={cn(
-              "flex items-center gap-1.5 pb-3 pt-2",
+              "flex items-center gap-1.5 pb-3 pt-4",
               isGridView && "pb-4",
             )}
             role="group"
