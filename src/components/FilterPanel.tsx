@@ -55,6 +55,11 @@ const SECTIONS: { field: FilterField; title: string }[] = [
 const panelRowGrid =
   "grid w-full grid-cols-[minmax(0,1fr)_1.75rem] items-center";
 
+/** Bloc aligné sur le champ Recherche : même largeur (geocoder Mapbox),
+    ancré au bord droit commun (px-6 du panneau = margin-right de la searchbar). */
+const dropdownAlignBlock =
+  "ml-auto w-[var(--filter-dropdown-width)] max-w-full";
+
 const panelControlCell = "flex h-7 items-center justify-center";
 
 const panelButtonBorder = "border-[1.5px] border-current";
@@ -137,6 +142,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
     <aside
       ref={asideRef}
       aria-label="Filtres"
+      data-filter-open={isOpen ? "" : undefined}
       className={cn(
         "fixed right-0 top-0 z-40 flex h-full w-full flex-col text-lg md:w-[min(100%,var(--layout-rail))]",
         isGridView
@@ -147,137 +153,141 @@ export const FilterPanel: FC<FilterPanelProps> = ({
       )}
     >
       <header className="pointer-events-auto px-6 pt-6">
-        <div className={panelRowGrid}>
-          <h2 className="font-bold leading-snug">Filtres</h2>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Fermer les filtres"
-            className={panelCloseButtonClass(isGridView)}
-          >
-            <span aria-hidden="true" className="text-lg leading-none">
-              x
-            </span>
-          </button>
-        </div>
-        <div
-          className={cn(
-            "flex items-center gap-1.5 pb-3 pt-2",
-            isGridView && "pb-4",
-          )}
-          role="group"
-          aria-label="Vue"
-        >
-          <button
-            type="button"
-            onClick={() => onViewChange("map")}
-            aria-pressed={currentView === "map"}
-            className={panelToggleButtonClass(
-              currentView === "map",
-              isGridView,
-            )}
-          >
-            Carte
-          </button>
-          <span aria-hidden="true" className="select-none opacity-50">
-            ↔
-          </span>
-          <button
-            type="button"
-            onClick={() => onViewChange("grid")}
-            aria-pressed={currentView === "grid"}
-            className={panelToggleButtonClass(
-              currentView === "grid",
-              isGridView,
-            )}
-          >
-            Index
-          </button>
-          {!isGridView && (
+        <div className={dropdownAlignBlock}>
+          <div className={panelRowGrid}>
+            <h2 className="font-bold leading-snug">Filtres</h2>
             <button
+              ref={closeRef}
               type="button"
-              onClick={onReset}
-              aria-pressed={hasActiveFilters}
-              className={cn(
-                panelToggleButtonClass(hasActiveFilters, isGridView),
-                "ml-auto",
-              )}
+              onClick={onClose}
+              aria-label="Fermer les filtres"
+              className={panelCloseButtonClass(isGridView)}
             >
-              reset
-            </button>
-          )}
-        </div>
-        {isGridView && (
-          <div
-            className="flex flex-wrap items-center gap-1.5 border-t border-black pb-3 pt-4"
-            role="group"
-            aria-label="Tri et réinitialisation"
-          >
-            <button
-              type="button"
-              onClick={() => onEntrySortChange("title")}
-              aria-pressed={entrySort === "title"}
-              aria-label={ENTRY_SORT_LABELS.title}
-              className={panelSortButtonClass(
-                entrySort === "title",
-                isGridView,
-              )}
-            >
-              <span className="flex items-center gap-1.5">
-                trier
-                <SortAlphabetIcon />
+              <span aria-hidden="true" className="text-lg leading-none">
+                x
               </span>
             </button>
-            <button
-              type="button"
-              onClick={() => onEntrySortChange("date-desc")}
-              aria-pressed={entrySort === "date-desc"}
-              className={panelSortButtonClass(
-                entrySort === "date-desc",
-                isGridView,
-              )}
-            >
-              date ↓
-            </button>
-            <button
-              type="button"
-              onClick={() => onEntrySortChange("date-asc")}
-              aria-pressed={entrySort === "date-asc"}
-              className={panelSortButtonClass(
-                entrySort === "date-asc",
-                isGridView,
-              )}
-            >
-              date ↑
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              aria-pressed={hasActiveFilters}
-              className={cn(
-                panelSortButtonClass(hasActiveFilters, isGridView),
-                "ml-auto",
-              )}
-            >
-              reset
-            </button>
           </div>
-        )}
+          <div
+            className={cn(
+              "flex items-center gap-1.5 pb-3 pt-2",
+              isGridView && "pb-4",
+            )}
+            role="group"
+            aria-label="Vue"
+          >
+            <button
+              type="button"
+              onClick={() => onViewChange("map")}
+              aria-pressed={currentView === "map"}
+              className={panelToggleButtonClass(
+                currentView === "map",
+                isGridView,
+              )}
+            >
+              Carte
+            </button>
+            <span aria-hidden="true" className="select-none opacity-50">
+              ↔
+            </span>
+            <button
+              type="button"
+              onClick={() => onViewChange("grid")}
+              aria-pressed={currentView === "grid"}
+              className={panelToggleButtonClass(
+                currentView === "grid",
+                isGridView,
+              )}
+            >
+              Index
+            </button>
+            {!isGridView && (
+              <button
+                type="button"
+                onClick={onReset}
+                aria-pressed={hasActiveFilters}
+                className={cn(
+                  panelToggleButtonClass(hasActiveFilters, isGridView),
+                  "ml-auto",
+                )}
+              >
+                reset
+              </button>
+            )}
+          </div>
+          {isGridView && (
+            <div
+              className="flex flex-wrap items-center gap-1.5 border-t border-black pb-3 pt-4"
+              role="group"
+              aria-label="Tri et réinitialisation"
+            >
+              <button
+                type="button"
+                onClick={() => onEntrySortChange("title")}
+                aria-pressed={entrySort === "title"}
+                aria-label={ENTRY_SORT_LABELS.title}
+                className={panelSortButtonClass(
+                  entrySort === "title",
+                  isGridView,
+                )}
+              >
+                <span className="flex items-center gap-1.5">
+                  trier
+                  <SortAlphabetIcon />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onEntrySortChange("date-desc")}
+                aria-pressed={entrySort === "date-desc"}
+                className={panelSortButtonClass(
+                  entrySort === "date-desc",
+                  isGridView,
+                )}
+              >
+                date ↓
+              </button>
+              <button
+                type="button"
+                onClick={() => onEntrySortChange("date-asc")}
+                aria-pressed={entrySort === "date-asc"}
+                className={panelSortButtonClass(
+                  entrySort === "date-asc",
+                  isGridView,
+                )}
+              >
+                date ↑
+              </button>
+              <button
+                type="button"
+                onClick={onReset}
+                aria-pressed={hasActiveFilters}
+                className={cn(
+                  panelSortButtonClass(hasActiveFilters, isGridView),
+                  "ml-auto",
+                )}
+              >
+                reset
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="relative min-h-0 flex-1">
         <div className="pointer-events-auto h-full overflow-y-auto px-6 py-4 scrollbar-hide filter-panel-scroll">
-          {SECTIONS.map(({ field, title }) => (
-            <CollapsibleSection
-              key={field}
-              title={title}
-              values={facets[field]}
-              activeValues={activeFilters[field]}
-              onToggle={(value) => onFilterChange(field, value)}
-              isGridView={isGridView}
-            />
-          ))}
+          <div className={dropdownAlignBlock}>
+            {SECTIONS.map(({ field, title }) => (
+              <CollapsibleSection
+                key={field}
+                title={title}
+                values={facets[field]}
+                activeValues={activeFilters[field]}
+                onToggle={(value) => onFilterChange(field, value)}
+                isGridView={isGridView}
+              />
+            ))}
+          </div>
         </div>
         <div
           className={cn(
@@ -336,7 +346,9 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
                 aria-pressed={isActive}
                 className={filterValueClass(isActive, isGridView)}
               >
-                <span className="min-w-0">{formatMultiValueString(value)}</span>
+                <span className="min-w-0 line-clamp-2 leading-snug">
+                  {formatMultiValueString(value)}
+                </span>
                 <span className={panelControlCell}>
                   {isActive && <span aria-hidden="true">×</span>}
                 </span>

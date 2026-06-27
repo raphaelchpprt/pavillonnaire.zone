@@ -12,7 +12,11 @@
   /** Zone réservée en bas du panneau filtres (géocodeur Mapbox + marges). */
   --map-bottom-controls-reserve: calc(1.5rem + 28px + 0.125rem);
   /** Fade bas filtres : collé au search. */
-  --filter-panel-fade-height: 2.75rem;
+  --filter-panel-fade-height: 1.5rem;
+  /** Largeur réelle du champ Recherche déplié = min-width Mapbox du geocoder
+      (240px ; le width:33.3333% retombe sous ce plancher). Sert à aligner le
+      déroulant des filtres sur la searchbar. */
+  --filter-dropdown-width: 240px;
 }
 
 @media (min-width: 768px) {
@@ -116,11 +120,19 @@
   }
 
   .filter-panel-scroll {
-    padding-bottom: var(--map-bottom-controls-reserve);
+    /* reserve (search) + fade : la dernière ligne dégage toute la bande de
+       fondu une fois scrollée en bas, sinon elle reste atténuée. */
+    padding-bottom: calc(
+      var(--map-bottom-controls-reserve) + var(--filter-panel-fade-height)
+    );
     -webkit-mask-image: linear-gradient(
       to bottom,
       #000 0%,
-      #000 calc(100% - var(--map-bottom-controls-reserve) - var(--filter-panel-fade-height)),
+      #000
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height)
+        ),
       rgb(0 0 0 / 0.86)
         calc(
           100% - var(--map-bottom-controls-reserve) -
@@ -147,7 +159,11 @@
     mask-image: linear-gradient(
       to bottom,
       #000 0%,
-      #000 calc(100% - var(--map-bottom-controls-reserve) - var(--filter-panel-fade-height)),
+      #000
+        calc(
+          100% - var(--map-bottom-controls-reserve) -
+            var(--filter-panel-fade-height)
+        ),
       rgb(0 0 0 / 0.86)
         calc(
           100% - var(--map-bottom-controls-reserve) -
@@ -178,7 +194,9 @@
     inset-inline: 0;
     bottom: 0;
     z-index: 1;
-    height: calc(var(--map-bottom-controls-reserve) + var(--filter-panel-fade-height));
+    height: calc(
+      var(--map-bottom-controls-reserve) + var(--filter-panel-fade-height)
+    );
     pointer-events: none;
   }
 
@@ -218,31 +236,31 @@
 }
 
 @font-face {
-  font-family: 'Yoster-Island';
+  font-family: "Yoster-Island";
   src:
-    local('yoster-island.regular'),
-    url(../../public/fonts/yoster-island.regular.ttf) format('truetype');
+    local("yoster-island.regular"),
+    url(../../public/fonts/yoster-island.regular.ttf) format("truetype");
 }
 
 @font-face {
-  font-family: 'Redaction35';
+  font-family: "Redaction35";
   font-weight: normal;
   font-style: normal;
-  src: url(../../public/fonts/Redaction35-Regular.otf) format('opentype');
+  src: url(../../public/fonts/Redaction35-Regular.otf) format("opentype");
 }
 
 @font-face {
-  font-family: 'Redaction35';
+  font-family: "Redaction35";
   font-weight: bold;
   font-style: normal;
-  src: url(../../public/fonts/Redaction35-Bold.otf) format('opentype');
+  src: url(../../public/fonts/Redaction35-Bold.otf) format("opentype");
 }
 
 @font-face {
-  font-family: 'Redaction35';
+  font-family: "Redaction35";
   font-weight: normal;
   font-style: italic;
-  src: url(../../public/fonts/Redaction35-Italic.otf) format('opentype');
+  src: url(../../public/fonts/Redaction35-Italic.otf) format("opentype");
 }
 
 *,
@@ -297,7 +315,7 @@ h6 {
 }
 
 body {
-  font-family: 'Redaction35';
+  font-family: "Redaction35";
 }
 
 ::selection {
@@ -351,12 +369,11 @@ body {
   border-color: rgb(251 113 133) !important;
 }
 
-
 .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-geocoder {
   margin-bottom: 1.5rem;
   margin-right: 1.5rem;
   padding: 0;
-  font-family: 'Yoster-Island';
+  font-family: "Yoster-Island";
   background-color: transparent;
   border: 1.5px solid white;
   border-radius: 0;
@@ -442,7 +459,9 @@ html.index-grid-view .mapboxgl-ctrl-geocoder .suggestions-wrapper {
   filter: none;
 }
 
-html.index-grid-view .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed .suggestions-wrapper {
+html.index-grid-view
+  .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed
+  .suggestions-wrapper {
   display: none;
 }
 
@@ -467,13 +486,27 @@ html.index-grid-view .mapboxgl-ctrl-geocoder--button:hover {
   background: #000 !important;
 }
 
-html.index-grid-view .mapboxgl-ctrl-geocoder--button:hover svg.mapboxgl-ctrl-geocoder--icon {
+html.index-grid-view
+  .mapboxgl-ctrl-geocoder--button:hover
+  svg.mapboxgl-ctrl-geocoder--icon {
   fill: #fff;
 }
 
 .mapboxgl-ctrl-bottom-right {
   max-width: 100px;
   mix-blend-mode: difference;
+}
+
+/* Panneau filtres ouvert en vue carte : .map-container reste sous le panneau
+   (z-40), donc sa zone scrollable pointer-events-auto recouvrirait le champ de
+   recherche en bas. On élève le geocoder au-dessus du panneau pour qu'il reste
+   focusable — même traitement que la vue Index (html.index-grid-view). */
+@media (min-width: 768px) {
+  html:not(.index-grid-view):has(aside[data-filter-open])
+    .mapboxgl-ctrl-bottom-right {
+    z-index: 50;
+    pointer-events: auto;
+  }
 }
 
 .mapboxgl-ctrl-geocoder {
@@ -572,7 +605,6 @@ see https://docs.mapbox.com/help/tutorials/building-a-store-locator/#define-inte
   width: 25px;
   height: 25px;
 }
-
 
 .mapbox-legend-item-description {
   min-height: 200px;
