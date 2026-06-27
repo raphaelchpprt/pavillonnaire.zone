@@ -27,6 +27,11 @@ function splitMultiValueParts(raw: string): string[] {
   return raw.split(/\s*;\s*/);
 }
 
+/**
+ * Split a multi-value field (` ; ` or `;` separator) into normalized tokens,
+ * deduplicated canonically (the first spelling is kept).
+ * @example parseMultiValue("Roman ; roman ; essai") // → ["Roman", "essai"]
+ */
 export function parseMultiValue(raw?: string): string[] {
   if (!raw) return [];
 
@@ -65,6 +70,11 @@ export function parseYear(value: unknown): number | undefined {
   return undefined;
 }
 
+/**
+ * Extract image URLs from the Mapbox `images` property (JSON string or array).
+ * Returns undefined when absent, malformed, or empty after filtering (never []).
+ * @example parseImagesProperty({ images: "[]" }) // → undefined
+ */
 export function parseImagesProperty(
   record: Record<string, unknown>,
 ): string[] | undefined {
@@ -92,6 +102,13 @@ export function parseImagesProperty(
   return urls.length > 0 ? urls : undefined;
 }
 
+/**
+ * Whether the entry matches the selection (case/accent-insensitive).
+ * An empty selection matches everything.
+ * @example matchesFilterSelection(["Roman"], [])        // → true
+ * @example matchesFilterSelection(["Roman"], ["roman"]) // → true
+ * @example matchesFilterSelection(["Roman"], ["essai"]) // → false
+ */
 export function matchesFilterSelection(
   entryValues: string[],
   selected: string[],

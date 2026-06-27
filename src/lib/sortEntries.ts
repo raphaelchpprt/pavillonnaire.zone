@@ -1,5 +1,11 @@
 import { Entry, EntrySort } from "@/types/entry";
 
+/**
+ * Array.sort comparator for years; missing years always sort last,
+ * regardless of `direction`.
+ * @example compareYear(1990, 2010, "desc")     // → 20 (most recent first)
+ * @example compareYear(2010, undefined, "asc") // → -1 (missing year last)
+ */
 function compareYear(
   a: number | undefined,
   b: number | undefined,

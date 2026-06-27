@@ -21,7 +21,8 @@ interface MapboxFeaturesResponse {
   features: MapboxFeature[];
 }
 
-function strProp(
+/** Return the property when it is a non-empty string (after trim), else undefined. */
+function nonEmptyStringProp(
   record: Record<string, unknown>,
   key: string,
 ): string | undefined {
@@ -33,14 +34,14 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   const p = feature.properties;
 
   const authors = dedupeTokens(
-    AUTHOR_FILTER_FIELDS.flatMap((f) => parseMultiValue(strProp(p, f))),
+    AUTHOR_FILTER_FIELDS.flatMap((f) => parseMultiValue(nonEmptyStringProp(p, f))),
   );
 
-  const typeRaw = strProp(p, "type");
-  const placeRaw = strProp(p, "place");
+  const typeRaw = nonEmptyStringProp(p, "type");
+  const placeRaw = nonEmptyStringProp(p, "place");
 
   const images = parseImagesProperty(p);
-  const image = strProp(p, "image") ?? images?.[0];
+  const image = nonEmptyStringProp(p, "image") ?? images?.[0];
 
   return {
     id: String(feature.id),
@@ -51,11 +52,11 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
     place: placeRaw,
     places: parseMultiValue(placeRaw),
     authors,
-    author: strProp(p, "author"),
-    director: strProp(p, "director"),
-    artist: strProp(p, "artist"),
-    album: strProp(p, "album"),
-    editor: strProp(p, "editor"),
+    author: nonEmptyStringProp(p, "author"),
+    director: nonEmptyStringProp(p, "director"),
+    artist: nonEmptyStringProp(p, "artist"),
+    album: nonEmptyStringProp(p, "album"),
+    editor: nonEmptyStringProp(p, "editor"),
     year: parseYear(p.year),
     image,
     images,
@@ -64,6 +65,10 @@ function normalizeEntry(feature: MapboxFeature, category: LayerType): Entry {
   };
 }
 
+/**
+ * Resolve a dataset's category: first via MAPBOX_DATASET_NAMES[index] when it
+ * is a valid LayerType, otherwise fall back to the default id → layer map.
+ */
 function resolveDatasetCategory(
   index: number,
   datasetIds: string[],

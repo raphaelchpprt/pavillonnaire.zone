@@ -60,6 +60,11 @@ function truncateWithEllipsis(
   return `${text.slice(0, lo).trimEnd()}${ELLIPSIS}`;
 }
 
+/**
+ * Break a word too long for line 1: `line1` ends with a hyphen and `rest` is
+ * the remainder pushed to line 2.
+ * @example splitWordForLine1("Transformations", fits) // → { line1: "Transforma-", rest: "tions" }
+ */
 function splitWordForLine1(
   word: string,
   fits: (value: string) => boolean,
