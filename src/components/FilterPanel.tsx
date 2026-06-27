@@ -198,23 +198,21 @@ export const FilterPanel: FC<FilterPanelProps> = ({
             >
               Index
             </button>
-            {!isGridView && (
-              <button
-                type="button"
-                onClick={onReset}
-                aria-pressed={hasActiveFilters}
-                className={cn(
-                  panelToggleButtonClass(hasActiveFilters, isGridView),
-                  "ml-auto",
-                )}
-              >
-                reset
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={onReset}
+              aria-pressed={hasActiveFilters}
+              className={cn(
+                panelToggleButtonClass(hasActiveFilters, isGridView),
+                "ml-auto",
+              )}
+            >
+              reset
+            </button>
           </div>
           {isGridView && (
             <div
-              className="flex flex-wrap items-center gap-1.5 border-t border-black pb-3 pt-4"
+              className="flex flex-wrap items-center gap-1.5 border-b border-black pb-6 pt-1"
               role="group"
               aria-label="Tri et réinitialisation"
             >
@@ -254,17 +252,6 @@ export const FilterPanel: FC<FilterPanelProps> = ({
                 )}
               >
                 date ↑
-              </button>
-              <button
-                type="button"
-                onClick={onReset}
-                aria-pressed={hasActiveFilters}
-                className={cn(
-                  panelSortButtonClass(hasActiveFilters, isGridView),
-                  "ml-auto",
-                )}
-              >
-                reset
               </button>
             </div>
           )}
