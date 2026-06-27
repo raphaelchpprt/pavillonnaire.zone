@@ -1,9 +1,9 @@
 import { hyphenateSync } from "hyphen/fr";
 
 const ELLIPSIS = "…";
-/** Césure quand un mot seul ne tient pas sur L1 (évite « L- / ot »). */
+/** Hyphenate a lone word only past this length (avoids "L-/ot"). */
 const MIN_HYPHEN_WORD_LENGTH = 8;
-/** Césure optionnelle L1→L2 : mot unique sur L1, assez long (ex. Transformations). */
+/** Min length to optionally hyphenate a lone L1 word into L2. */
 const MIN_OPTIONAL_HYPHEN_LENGTH = 12;
 
 export type GridTitleLines = {
@@ -44,7 +44,6 @@ function createMeasurer(container: HTMLElement): {
   };
 }
 
-/** Remplit au maximum la ligne avec ellipsis en fin. */
 function truncateWithEllipsis(
   text: string,
   fits: (value: string) => boolean,
@@ -63,7 +62,6 @@ function truncateWithEllipsis(
   return `${text.slice(0, lo).trimEnd()}${ELLIPSIS}`;
 }
 
-/** Césure max sur L1 avec tiret ; le reste du mot passe en L2. */
 function splitWordForLine1(
   word: string,
   fits: (value: string) => boolean,
@@ -108,11 +106,8 @@ function splitWordForLine1(
   return best;
 }
 
-/**
- * Mot unique sur L1 : si une L2 existe et que le mot est très long, césurer
- * pour y envoyer le suffixe (ex. « Transformations pavill… » → « Transforma- »
- * / « tions pavill… »). Ne s’applique pas à « Banlieue Pavillo… ».
- */
+/** Lone long word on L1 + an L2 exists → hyphenate to push the suffix down
+ *  (e.g. "Transforma-" / "tions pavill…"). Skips short words. */
 function maybeHyphenateLastWordOnLine1(
   line1: string,
   rest: string,
@@ -150,7 +145,6 @@ function buildLines(
   };
 }
 
-/** Découpe un titre : tiret uniquement en fin de L1, ellipsis en fin de L2 si besoin. */
 export function splitGridTitle(
   container: HTMLElement,
   text: string,

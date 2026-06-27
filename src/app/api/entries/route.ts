@@ -8,7 +8,6 @@ import {
 } from "@/lib/normalize";
 import { AUTHOR_FILTER_FIELDS, Entry } from "@/types/entry";
 
-/** Données Mapbox : route dynamique (env + fetch), pas de cache statique. */
 export const dynamic = "force-dynamic";
 
 interface MapboxFeature {

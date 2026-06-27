@@ -51,12 +51,9 @@ const SECTIONS: { field: FilterField; title: string }[] = [
   { field: "type", title: "Type" },
 ];
 
-/** Colonne droite partagée (croix, flèches, ×) — alignée sur right-6 du bouton [i] */
 const panelRowGrid =
   "grid w-full grid-cols-[minmax(0,1fr)_1.75rem] items-center";
 
-/** Bloc aligné sur le champ Recherche : même largeur (geocoder Mapbox),
-    ancré au bord droit commun (px-6 du panneau = margin-right de la searchbar). */
 const dropdownAlignBlock =
   "ml-auto w-[var(--filter-dropdown-width)] max-w-full";
 

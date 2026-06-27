@@ -1,10 +1,7 @@
 import { LayerType } from '@/constants/layers';
 
-/**
- * Mapbox dataset IDs (Phase 2 plan) → layer id used in the app.
- * Lets `/api/entries` resolve categories when `MAPBOX_DATASET_NAMES` is unset,
- * as long as `MAPBOX_DATASET_IDS` preserves the same order or uses these IDs.
- */
+/** Default Mapbox dataset id → layer. Fallback for `/api/entries` when
+ *  `MAPBOX_DATASET_NAMES` is unset (relies on `MAPBOX_DATASET_IDS` order/ids). */
 export const MAPBOX_DEFAULT_DATASET_ID_TO_LAYER: Record<string, LayerType> = {
   ckv6rxyld5hre20phzrg56r3w: 'edition',
   ckx08odti3jzv28k3qtc13k38: 'musique',

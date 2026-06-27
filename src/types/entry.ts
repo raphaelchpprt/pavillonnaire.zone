@@ -4,17 +4,17 @@ export interface Entry {
   id: string;
   category: LayerType;
   title: string;
-  /** Valeur brute Mapbox (affichage). */
+  /** Raw Mapbox value (display). */
   type?: string;
-  /** Types normalisés pour facettes / filtres (séparateur ` ; `). */
+  /** Normalized for facets/filters (` ; ` separator). */
   types: string[];
-  /** Valeur brute Mapbox (affichage). */
+  /** Raw Mapbox value (display). */
   place?: string;
-  /** Lieux normalisés pour facettes / filtres (séparateur ` ; `). */
+  /** Normalized for facets/filters (` ; ` separator). */
   places: string[];
-  /** Valeurs pour facette / filtre Auteur.ices (author, director, artist). */
+  /** Auteur.ices facet/filter values (author, director, artist). */
   authors: string[];
-  /** Original property strings for modal display (parallel to map features). */
+  /** Raw property strings for modal display. */
   author?: string;
   director?: string;
   artist?: string;
@@ -36,7 +36,7 @@ export const AUTHOR_FIELDS = [
 ] as const;
 export type AuthorField = (typeof AUTHOR_FIELDS)[number];
 
-/** Sous-ensemble utilisé pour le filtre « Auteur.ices » (hors éditeur / album). */
+/** Subset used for the "Auteur.ices" filter (excludes editor/album). */
 export const AUTHOR_FILTER_FIELDS = [
   "author",
   "director",
@@ -47,7 +47,6 @@ export type FilterField = "date" | "author" | "place" | "type";
 
 export type ViewMode = "map" | "grid";
 
-/** Tri de l’index grille. */
 export type EntrySort = "title" | "date-asc" | "date-desc";
 
 export const ENTRY_SORT_VALUES = [

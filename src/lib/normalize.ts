@@ -1,4 +1,3 @@
-/** Séparateur pour plusieurs valeurs dans une propriété Mapbox (type, lieu). */
 export const MULTI_VALUE_DELIMITER = " ; ";
 
 const LOCALE = "fr-FR";
@@ -11,14 +10,12 @@ export function canonicalKey(value: string): string {
   return normalizeToken(value).toLocaleLowerCase(LOCALE);
 }
 
-/** Libellé facettes / liste de filtres : majuscule initiale (fr), reste identique aux données. */
 export function formatFacetDisplayLabel(value: string): string {
   const t = normalizeToken(value);
   if (t.length === 0) return t;
   return t.charAt(0).toLocaleUpperCase(LOCALE) + t.slice(1);
 }
 
-/** Affichage multi-valeurs : virgules à la place des « ; » (filtres, modale, tooltip). */
 export function formatMultiValueString(raw?: string): string {
   if (!raw) return "";
   const parts = parseMultiValue(raw);
@@ -26,12 +23,10 @@ export function formatMultiValueString(raw?: string): string {
   return parts.map(formatFacetDisplayLabel).join(", ");
 }
 
-/** Découpe sur « ; » avec espaces optionnels autour. */
 function splitMultiValueParts(raw: string): string[] {
   return raw.split(/\s*;\s*/);
 }
 
-/** Découpe, nettoie et fusionne les doublons (casse, espaces). */
 export function parseMultiValue(raw?: string): string[] {
   if (!raw) return [];
 
@@ -91,7 +86,7 @@ export function matchesFilterSelection(
   return selected.some((value) => entryKeys.has(canonicalKey(value)));
 }
 
-/** Expression Mapbox : champ texte multi-valeurs (` ; `) contient une des sélections. */
+/** Mapbox expression: multi-value text field (` ; `) contains a selection. */
 export function buildMapboxMultiValueFilter(
   property: string,
   selected: string[],

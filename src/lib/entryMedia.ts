@@ -1,6 +1,5 @@
-import { Entry } from '@/types/entry';
+import { Entry } from "@/types/entry";
 
-/** URLs image candidates pour la grille (image principale puis galerie). */
 export function getEntryThumbnailUrls(entry: Entry): string[] {
   const urls: string[] = [];
   const add = (value?: string) => {

@@ -9,11 +9,8 @@ interface LegendFilterProps {
   selectedLayers: Set<LayerType>;
   onFilterChange: (layerId: LayerType) => void;
   className?: string;
-  /**
-   * Carte : pictos en négatif (mix-blend-difference sur le fond de carte).
-   * Index : la grille passe map-container en stacking context isolé, le blend
-   * ne réagit plus au fond blanc → pictos en noir plein sans blend.
-   */
+  /** map: icons negated via mix-blend-difference. grid: map-container is an
+   *  isolated stacking context → blend dies, so icons render solid black. */
   surface?: "map" | "grid";
 }
 

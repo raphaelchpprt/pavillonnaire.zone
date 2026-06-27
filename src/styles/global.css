@@ -3,19 +3,12 @@
 @tailwind utilities;
 
 :root {
-  /* Même largeur que la searchbar Mapbox dépliée (global.css .mapboxgl-ctrl-geocoder) */
   --layout-rail: min(33.333vw, 360px);
   --index-content-gutter-right: 1.5rem;
-  /* left-6 + icône légende (28px) + tampon — évite le chevauchement avec le label hover */
   --index-content-gutter-left: 4.5rem;
   --index-header-fade-height: 6rem;
-  /** Zone réservée en bas du panneau filtres (géocodeur Mapbox + marges). */
   --map-bottom-controls-reserve: calc(1.5rem + 28px + 0.125rem);
-  /** Fade bas filtres : collé au search. */
   --filter-panel-fade-height: 1.5rem;
-  /** Largeur réelle du champ Recherche déplié = min-width Mapbox du geocoder
-      (240px ; le width:33.3333% retombe sous ce plancher). Sert à aligner le
-      déroulant des filtres sur la searchbar. */
   --filter-dropdown-width: 240px;
 }
 
@@ -63,7 +56,6 @@
     display: none;
   }
 
-  /* Grille index : zone image hauteur fixe, images calées en bas */
   .index-entry-media {
     display: flex;
     width: 100%;
@@ -91,7 +83,6 @@
     object-position: bottom;
   }
 
-  /* Grille index : caption flex (min-w-0) pour que le titre ne passe pas sous le drapeau */
   .index-entry-caption {
     display: flex;
     width: 100%;
@@ -120,8 +111,6 @@
   }
 
   .filter-panel-scroll {
-    /* reserve (search) + fade : la dernière ligne dégage toute la bande de
-       fondu une fois scrollée en bas, sinon elle reste atténuée. */
     padding-bottom: calc(
       var(--map-bottom-controls-reserve) + var(--filter-panel-fade-height)
     );
@@ -336,7 +325,6 @@ body {
   display: none !important;
 }
 
-/* Contrôles carte : pas de mix-blend (couleurs roses / UI lisibles) */
 .mapboxgl-ctrl-top-right,
 .mapboxgl-ctrl-bottom-left {
   z-index: 20;
@@ -421,7 +409,6 @@ svg.mapboxgl-ctrl-geocoder--icon {
 html.index-grid-view .map-container {
   position: absolute;
   inset: 0;
-  /* Au-dessus du panneau filtres (z-40) pour garder le search visible ; clics filtres via pointer-events-none */
   z-index: 45;
   pointer-events: none;
   background: transparent;
@@ -497,10 +484,6 @@ html.index-grid-view
   mix-blend-mode: difference;
 }
 
-/* Panneau filtres ouvert en vue carte : .map-container reste sous le panneau
-   (z-40), donc sa zone scrollable pointer-events-auto recouvrirait le champ de
-   recherche en bas. On élève le geocoder au-dessus du panneau pour qu'il reste
-   focusable — même traitement que la vue Index (html.index-grid-view). */
 @media (min-width: 768px) {
   html:not(.index-grid-view):has(aside[data-filter-open])
     .mapboxgl-ctrl-bottom-right {
