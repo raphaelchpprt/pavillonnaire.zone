@@ -141,7 +141,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
       aria-label="Filtres"
       data-filter-open={isOpen ? "" : undefined}
       className={cn(
-        "fixed right-0 top-0 z-40 flex h-full w-full flex-col text-lg md:w-[min(100%,var(--layout-rail))]",
+        "fixed right-0 top-0 z-40 flex h-full w-full flex-col text-base md:w-[min(100%,var(--layout-rail))]",
         isGridView
           ? "bg-white text-black"
           : "max-md:bg-black max-md:text-white md:bg-transparent md:text-white md:mix-blend-difference",
@@ -166,10 +166,7 @@ export const FilterPanel: FC<FilterPanelProps> = ({
             </button>
           </div>
           <div
-            className={cn(
-              "flex items-center gap-1.5 pb-3 pt-4",
-              isGridView && "pb-4",
-            )}
+            className="flex items-center gap-1.5 pt-4"
             role="group"
             aria-label="Vue"
           >
@@ -196,23 +193,13 @@ export const FilterPanel: FC<FilterPanelProps> = ({
                 isGridView,
               )}
             >
-              Index
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              aria-pressed={hasActiveFilters}
-              className={cn(
-                panelToggleButtonClass(hasActiveFilters, isGridView),
-                "ml-auto",
-              )}
-            >
-              reset
+              Catalogue
             </button>
           </div>
+          <div className="mb-2 mt-4 border-b border-current" />
           {isGridView && (
             <div
-              className="flex flex-wrap items-center gap-1.5 pb-1 pt-1"
+              className="flex flex-wrap items-center gap-1.5 pt-2"
               role="group"
               aria-label="Tri et réinitialisation"
             >
@@ -255,6 +242,16 @@ export const FilterPanel: FC<FilterPanelProps> = ({
               </button>
             </div>
           )}
+          <div className={cn("flex pt-2", isGridView ? "pb-2" : "pb-1")}>
+            <button
+              type="button"
+              onClick={onReset}
+              aria-pressed={hasActiveFilters}
+              className={panelSortButtonClass(hasActiveFilters, isGridView)}
+            >
+              reset
+            </button>
+          </div>
         </div>
       </header>
 

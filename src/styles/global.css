@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --layout-rail: min(33.333vw, 360px);
+  --layout-rail: min(33.333vw, 264px);
   --index-content-gutter-right: 1.5rem;
   --index-content-gutter-left: 4.5rem;
   --index-header-fade-height: 6rem;
   --map-bottom-controls-reserve: calc(1.5rem + 28px + 0.125rem);
   --filter-panel-fade-height: 1.5rem;
-  --filter-dropdown-width: 240px;
+  --filter-dropdown-width: 200px;
 }
 
 @media (min-width: 768px) {
@@ -60,7 +60,7 @@
     display: flex;
     width: 100%;
     align-items: flex-end;
-    justify-content: center;
+    justify-content: flex-start;
     height: clamp(5.5rem, 28vw, 9.5rem);
   }
 
@@ -77,10 +77,11 @@
   }
 
   .index-entry-media img {
-    max-height: 100%;
-    width: 100%;
-    object-fit: contain;
-    object-position: bottom;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: cover;
+    object-position: center;
   }
 
   .index-entry-caption {
@@ -521,8 +522,8 @@ html.index-grid-view
 
 .mapboxgl-ctrl-geocoder {
   height: 28px;
-  width: 33.3333%;
-  max-width: 360px;
+  width: min(var(--filter-dropdown-width), 33.3333vw);
+  max-width: calc(100vw - 3rem);
 }
 
 .mapboxgl-ctrl-geocoder--input {
