@@ -60,7 +60,7 @@
     display: flex;
     width: 100%;
     align-items: flex-end;
-    justify-content: flex-start;
+    justify-content: center;
     height: clamp(5.5rem, 28vw, 9.5rem);
   }
 
@@ -522,7 +522,8 @@ html.index-grid-view
 
 .mapboxgl-ctrl-geocoder {
   height: 28px;
-  width: min(var(--filter-dropdown-width), 33.3333vw);
+  width: min(var(--filter-dropdown-width), calc(100vw - 3rem)) !important;
+  min-width: 0 !important;
   max-width: calc(100vw - 3rem);
 }
 

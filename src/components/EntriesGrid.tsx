@@ -40,9 +40,9 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
             <div className="index-entry-media">
               <EntryThumbnail entry={entry} alt={entry.title} />
             </div>
-            <div className="index-entry-caption pt-1.5">
-              <GridEntryTitle title={entry.title} />
+            <div className="index-entry-caption pt-2.5">
               {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden />}
+              <GridEntryTitle title={entry.title} />
             </div>
           </button>
         );

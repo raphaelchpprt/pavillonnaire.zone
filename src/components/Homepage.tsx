@@ -27,7 +27,6 @@ import {
   buildViewUrl,
   buildIndexOpenUrl,
   buildIndexCloseUrl,
-  hasPanelFilters,
 } from "@/lib/filtersUrl";
 import { Entry, FilterField, EntrySort, ViewMode } from "@/types/entry";
 import { LayerType } from "@/constants/layers";
@@ -59,11 +58,6 @@ export default function Homepage() {
     selectedLayers,
     isMapLoaded,
   } = useMapBox(activeFilters);
-
-  const hasActiveFilters =
-    hasPanelFilters(activeFilters) ||
-    selectedLayers.size > 0 ||
-    entrySort !== "title";
 
   const { entries, isLoading, error, reload } = useEntries();
   const facets = useMemo(() => computeFacets(entries), [entries]);
@@ -236,7 +230,6 @@ export default function Homepage() {
         onFilterChange={toggleFilter}
         currentView={isGridView ? "grid" : "map"}
         onViewChange={handleViewChange}
-        hasActiveFilters={hasActiveFilters}
         onReset={handleResetFilters}
         entrySort={entrySort}
         onEntrySortChange={handleEntrySortChange}

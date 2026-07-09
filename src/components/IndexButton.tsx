@@ -21,7 +21,7 @@ export const IndexButton: FC<IndexButtonProps> = ({ onClick, className }) => {
       )}
     >
       <span aria-hidden="true" className="text-lg leading-none font-bold">
-        i
+        c
       </span>
     </button>
   );
