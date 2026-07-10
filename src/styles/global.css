@@ -384,7 +384,10 @@ svg.mapboxgl-ctrl-geocoder--icon {
 .mapboxgl-ctrl-geocoder--input {
   color: white !important;
   height: 28px !important;
-  padding: 0 32px !important;
+  /* Right side only needs a small gap: the close icon is hidden, so the full
+     "Recherche par lieu" placeholder gets the reclaimed room. Left keeps space
+     for the search icon. */
+  padding: 0 8px 0 32px !important;
 }
 
 .mapboxgl-ctrl-geocoder--input:focus {
