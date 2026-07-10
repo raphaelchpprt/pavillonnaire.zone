@@ -62,6 +62,7 @@
     align-items: flex-end;
     justify-content: center;
     height: clamp(5.5rem, 28vw, 9.5rem);
+    border: 1.5px solid #000;
   }
 
   @media (min-width: 640px) {
@@ -84,13 +85,17 @@
     object-position: center;
   }
 
+  /* Residual side-gap: fill the full cell width (see FIT_WIDTH_THRESHOLD_PX). */
+  .index-entry-media img.fit-width {
+    width: 100%;
+  }
+
   .index-entry-caption {
     display: flex;
     width: 100%;
     min-width: 0;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.375rem;
-    height: calc(0.875rem * 1.375 * 2);
   }
 
   .index-entry-title {
@@ -99,15 +104,8 @@
     min-width: 0;
     flex: 1 1 auto;
     line-height: 1.375;
-  }
-
-  .index-entry-title-line {
-    display: block;
     overflow: hidden;
     white-space: nowrap;
-  }
-
-  .index-entry-title-line--ellipsis {
     text-overflow: ellipsis;
   }
 

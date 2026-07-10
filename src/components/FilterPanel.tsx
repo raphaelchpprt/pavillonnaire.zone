@@ -1,6 +1,7 @@
 "use client";
 
 import { formatMultiValueString } from "@/lib/normalize";
+import { hasPanelFilters } from "@/lib/filtersUrl";
 import { cn } from "@/utils";
 import { FC, useEffect, useRef, useState } from "react";
 import {
@@ -116,6 +117,9 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   onEntrySortChange,
 }) => {
   const isGridView = currentView === "grid";
+  // reset clears both the panel filters and the sort (buildFiltersResetUrl), so
+  // it reads as "active" whenever either differs from its default.
+  const isResetActive = hasPanelFilters(activeFilters) || entrySort !== "title";
   const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -243,10 +247,14 @@ export const FilterPanel: FC<FilterPanelProps> = ({
               type="button"
               onClick={onReset}
               className={cn(
-                "cursor-pointer px-1.5 py-0.5 text-base leading-none transition-colors",
+                "cursor-pointer border-[1.5px] border-transparent px-1.5 py-0.5 text-base leading-none transition-colors",
                 isGridView
-                  ? "bg-white text-black hover:bg-black hover:text-white"
-                  : "bg-black text-white hover:bg-white hover:text-black",
+                  ? isResetActive
+                    ? "bg-black text-white hover:border-black hover:bg-white hover:text-black"
+                    : "bg-white text-black hover:bg-black hover:text-white"
+                  : isResetActive
+                    ? "bg-white text-black hover:border-white hover:bg-black hover:text-white"
+                    : "bg-black text-white hover:bg-white hover:text-black",
               )}
             >
               reset

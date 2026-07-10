@@ -33,11 +33,11 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
             onClick={() => onSelect(entry)}
             title={entry.title}
             className={cn(
-              "w-full min-w-0 cursor-pointer text-left transition-[filter] duration-200",
+              "group w-full min-w-0 cursor-pointer text-left transition-[filter] duration-200",
               !isActive && "grayscale hover:grayscale-0",
             )}
           >
-            <div className="index-entry-media">
+            <div className="index-entry-media transition-colors duration-200 group-hover:bg-black">
               <EntryThumbnail entry={entry} alt={entry.title} />
             </div>
             <div className="index-entry-caption pt-2.5">
