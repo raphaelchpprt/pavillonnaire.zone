@@ -94,14 +94,14 @@ const filterValueClass = (isActive: boolean, isGridView: boolean) =>
     "cursor-pointer px-1 text-left",
     isGridView
       ? cn(
-          isActive && "bg-black text-white",
-          !isActive && "text-black hover:bg-black hover:text-white",
-        )
+        isActive && "bg-black text-white",
+        !isActive && "text-black hover:bg-black hover:text-white",
+      )
       : cn(
-          isActive && "bg-white text-black",
-          !isActive &&
-            "bg-transparent text-white hover:bg-white hover:text-black",
-        ),
+        isActive && "bg-white text-black",
+        !isActive &&
+        "bg-transparent text-white hover:bg-white hover:text-black",
+      ),
   );
 
 export const FilterPanel: FC<FilterPanelProps> = ({
@@ -148,56 +148,65 @@ export const FilterPanel: FC<FilterPanelProps> = ({
         !isOpen && "hidden",
       )}
     >
-      <header className="pointer-events-auto px-6 pt-6">
+      <header className="pointer-events-auto px-6 pt-[var(--filter-panel-header-padding)]">
         <div className={dropdownAlignBlock}>
-          <div className={cn(panelRowGrid, "h-7")}>
-            <div
-              className="flex items-center gap-1.5"
-              role="group"
-              aria-label="Vue"
-            >
-              <button
-                type="button"
-                onClick={() => onViewChange("map")}
-                aria-pressed={currentView === "map"}
-                className={cn(
-                  panelToggleButtonClass(currentView === "map", isGridView),
-                  "flex h-7 items-center",
-                )}
+          <div
+            className={cn(
+              isGridView &&
+              "index-header-reserve flex flex-col justify-between",
+            )}
+          >
+            <div className={cn(panelRowGrid, "h-7")}>
+              <div
+                className="flex items-center gap-1.5"
+                role="group"
+                aria-label="Vue"
               >
-                Carte
-              </button>
-              <span aria-hidden="true" className="select-none">
-                {"↔︎"}
-              </span>
+                <button
+                  type="button"
+                  onClick={() => onViewChange("map")}
+                  aria-pressed={currentView === "map"}
+                  className={cn(
+                    panelToggleButtonClass(currentView === "map", isGridView),
+                    "flex h-7 items-center",
+                  )}
+                >
+                  Carte
+                </button>
+                <span aria-hidden="true" className="select-none">
+                  {"↔︎"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onViewChange("grid")}
+                  aria-pressed={currentView === "grid"}
+                  className={cn(
+                    panelToggleButtonClass(currentView === "grid", isGridView),
+                    "flex h-7 items-center",
+                  )}
+                >
+                  Catalogue
+                </button>
+              </div>
               <button
+                ref={closeRef}
                 type="button"
-                onClick={() => onViewChange("grid")}
-                aria-pressed={currentView === "grid"}
-                className={cn(
-                  panelToggleButtonClass(currentView === "grid", isGridView),
-                  "flex h-7 items-center",
-                )}
+                onClick={onClose}
+                aria-label="Fermer les filtres"
+                className={panelCloseButtonClass(isGridView)}
               >
-                Catalogue
+                <span aria-hidden="true" className="text-lg leading-none">
+                  x
+                </span>
               </button>
             </div>
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={onClose}
-              aria-label="Fermer les filtres"
-              className={panelCloseButtonClass(isGridView)}
-            >
-              <span aria-hidden="true" className="text-lg leading-none">
-                x
-              </span>
-            </button>
+            {!isGridView && (
+              <div className="mb-2 mt-4 border-b border-current" />
+            )}
           </div>
-          <div className="mb-2 mt-4 border-b border-current" />
           {isGridView && (
             <div
-              className="flex items-center gap-1.5 pt-2"
+              className="flex items-center gap-1.5"
               role="group"
               aria-label="Tri et réinitialisation"
             >

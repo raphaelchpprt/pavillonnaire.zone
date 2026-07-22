@@ -18,10 +18,10 @@ type EntryThumbnailProps = {
 // "Dernière Danse") must stay contained with their bars, like book covers and
 // logos — only near-flush images get filled. Tunable.
 //
-// Calibration: "Pavillonner" (gap ~20-30) should fill, while "Banlieue
-// Pavillonnaire" / "Dernière Danse" (gap ~30-40) must stay contained — so the
-// threshold sits between them.
-const FIT_WIDTH_THRESHOLD_PX = 30;
+// Calibration (measured at lg, cell padding included): "Pavillonner" (gap ~32)
+// should fill, while "Banlieue Pavillonnaire" / "Dernière Danse" (gap ~50) must
+// stay contained — so the threshold sits between them.
+const FIT_WIDTH_THRESHOLD_PX = 40;
 
 export const EntryThumbnail: FC<EntryThumbnailProps> = ({ entry, alt }) => {
   const urls = useMemo(() => getEntryThumbnailUrls(entry), [entry]);

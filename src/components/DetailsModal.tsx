@@ -57,7 +57,7 @@ export const DetailsModal: FC<DetailsModalProps> = ({ feature, onClose }) => {
   return (
     <aside
       id="details-dialog"
-      className="absolute invert-select right-0 top-0 z-50 hidden h-full w-full overflow-auto border border-black bg-white p-4 scrollbar-hide sm:w-[max(25%,350px)]"
+      className="details-panel-width absolute invert-select right-0 top-0 z-50 hidden h-full overflow-auto bg-white p-4 scrollbar-hide"
     >
       {images && images.length > 0 ? (
         <ImageCarousel

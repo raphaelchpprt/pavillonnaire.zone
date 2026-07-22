@@ -21,7 +21,7 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
   onSelect,
 }) => {
   return (
-    <div className="index-content-gutter index-grid-scroll grid h-full w-full grid-cols-2 content-start gap-x-6 gap-y-8 overflow-y-auto pb-8 scrollbar-hide sm:grid-cols-3 lg:grid-cols-5">
+    <div className="index-content-gutter index-grid-scroll index-grid h-full w-full overflow-y-auto pb-8 scrollbar-hide">
       {entries.map((entry) => {
         const isActive = entry.id === selectedEntryId;
         const Icon = LAYERS_BY_ID.get(entry.category)?.Icon;
@@ -37,8 +37,15 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
               !isActive && "grayscale hover:grayscale-0",
             )}
           >
-            <div className="index-entry-media transition-colors duration-200 group-hover:bg-black">
-              <EntryThumbnail entry={entry} alt={entry.title} />
+            <div
+              className={cn(
+                "index-entry-media transition-colors duration-200",
+                isActive ? "bg-black" : "group-hover:bg-black",
+              )}
+            >
+              <div className="index-entry-media-inner">
+                <EntryThumbnail entry={entry} alt={entry.title} />
+              </div>
             </div>
             <div className="index-entry-caption pt-2.5">
               {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden />}

@@ -110,6 +110,11 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
       setIsMapLoaded(true);
     });
 
+    function isDetailsDialogOpen() {
+      const dialog = document.getElementById("details-dialog");
+      return !!dialog && !dialog.classList.contains("hidden");
+    }
+
     function getVisibleFeatures(point: mapboxgl.Point) {
       const effectiveLayers = getEffectiveVisibleLayers(
         selectedLayersRef.current,
@@ -132,7 +137,8 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
       }
 
       const feature = features[0];
-      setFeature(feature);
+
+      if (!isDetailsDialogOpen()) setFeature(feature);
 
       map.getCanvas().style.cursor = "pointer";
 
@@ -164,6 +170,7 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
         return;
       }
 
+      setFeature(features[0]);
       dialog?.classList.remove("hidden");
     }
 

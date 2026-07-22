@@ -9,13 +9,39 @@
   --index-header-fade-height: 6rem;
   --map-bottom-controls-reserve: calc(1.5rem + 28px + 0.125rem);
   --filter-panel-fade-height: 1.5rem;
+  --filter-panel-header-padding: 1.5rem;
   --filter-dropdown-width: 200px;
+  --index-grid-gap: 1.5rem;
+  --index-grid-columns: 2;
+  --index-grid-column: calc(
+    (
+        100vw - var(--index-content-gutter-left) -
+          var(--index-content-gutter-right) - (var(--index-grid-columns) - 1) *
+          var(--index-grid-gap)
+      ) /
+      var(--index-grid-columns)
+  );
+  --details-panel-width: calc(
+    var(--index-content-gutter-right) + var(--index-grid-column)
+  );
+}
+
+@media (min-width: 640px) {
+  :root {
+    --index-grid-columns: 3;
+  }
 }
 
 @media (min-width: 768px) {
   :root {
     --index-content-gutter-left: var(--layout-rail);
     --index-content-gutter-right: var(--layout-rail);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --index-grid-columns: 5;
   }
 }
 
@@ -27,6 +53,14 @@
 
   .index-grid-scroll {
     padding-top: var(--index-header-fade-height);
+  }
+
+  .index-grid {
+    display: grid;
+    align-content: start;
+    grid-template-columns: repeat(var(--index-grid-columns), minmax(0, 1fr));
+    column-gap: var(--index-grid-gap);
+    row-gap: 2rem;
   }
 
   .index-header-fade {
@@ -56,13 +90,41 @@
     display: none;
   }
 
+  .index-header-reserve {
+    height: calc(
+      var(--index-header-fade-height) - var(--filter-panel-header-padding)
+    );
+  }
+
+  .details-panel-width {
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .details-panel-width {
+      width: max(25%, 350px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .details-panel-width {
+      width: var(--details-panel-width);
+    }
+  }
+
   .index-entry-media {
+    width: 100%;
+    height: clamp(5.5rem, 28vw, 9.5rem);
+    border: 1.5px solid #000;
+    padding: 0.5rem;
+  }
+
+  .index-entry-media-inner {
     display: flex;
+    height: 100%;
     width: 100%;
     align-items: flex-end;
     justify-content: center;
-    height: clamp(5.5rem, 28vw, 9.5rem);
-    border: 1.5px solid #000;
   }
 
   @media (min-width: 640px) {
