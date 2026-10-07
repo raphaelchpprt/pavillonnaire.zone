@@ -1,14 +1,18 @@
 import { FC } from "react";
+import { cn } from "@/utils";
 
 type GridEntryTitleProps = {
   title: string;
+  className?: string;
 };
 
-export const GridEntryTitle: FC<GridEntryTitleProps> = ({ title }) => (
+export const GridEntryTitle: FC<GridEntryTitleProps> = ({
+  title,
+  className,
+}) => (
   <span
     lang="fr"
-    className="index-entry-title font-serif text-sm leading-snug"
-    title={title}
+    className={cn("index-entry-title font-serif text-sm", className)}
   >
     {title}
   </span>

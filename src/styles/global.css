@@ -12,6 +12,7 @@
   --filter-panel-header-padding: 1.5rem;
   --filter-dropdown-width: 200px;
   --index-grid-gap: 1.5rem;
+  --index-entry-caption-spacing: 0.25rem;
   --index-grid-columns: 2;
   --index-grid-column: calc(
     (
@@ -117,6 +118,8 @@
     height: clamp(5.5rem, 28vw, 9.5rem);
     border: 1.5px solid #000;
     padding: 0.5rem;
+    position: relative;
+    z-index: 1;
   }
 
   .index-entry-media-inner {
@@ -153,22 +156,32 @@
   }
 
   .index-entry-caption {
-    display: flex;
+    position: relative;
     width: 100%;
-    min-width: 0;
-    align-items: center;
-    gap: 0.375rem;
+    margin-top: -1.5px;
+  }
+
+  .index-entry-icon {
+    position: relative;
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .index-entry-title {
-    display: block;
-    width: 0;
-    min-width: 0;
-    flex: 1 1 auto;
+    position: absolute;
+    top: 0;
+    left: calc(1.25rem + var(--index-entry-caption-spacing));
+    z-index: 10;
+    max-width: calc(100% - 1.25rem - var(--index-entry-caption-spacing));
+    padding: var(--index-entry-caption-spacing);
+    background: #000;
+    color: #fff;
     line-height: 1.375;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   .filter-panel-scroll {

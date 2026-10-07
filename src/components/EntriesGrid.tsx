@@ -24,7 +24,10 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
     <div className="index-content-gutter index-grid-scroll index-grid h-full w-full overflow-y-auto pb-8 scrollbar-hide">
       {entries.map((entry) => {
         const isActive = entry.id === selectedEntryId;
-        const Icon = LAYERS_BY_ID.get(entry.category)?.Icon;
+        const layer = LAYERS_BY_ID.get(entry.category);
+        const revealOnHoverOrActive = isActive
+          ? "visible"
+          : "invisible group-hover:visible";
 
         return (
           <button
@@ -33,13 +36,13 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
             onClick={() => onSelect(entry)}
             title={entry.title}
             className={cn(
-              "group w-full min-w-0 cursor-pointer text-left transition-[filter] duration-200",
+              "group w-full min-w-0 cursor-pointer text-left",
               !isActive && "grayscale hover:grayscale-0",
             )}
           >
             <div
               className={cn(
-                "index-entry-media transition-colors duration-200",
+                "index-entry-media",
                 isActive ? "bg-black" : "group-hover:bg-black",
               )}
             >
@@ -47,9 +50,24 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
                 <EntryThumbnail entry={entry} alt={entry.title} />
               </div>
             </div>
-            <div className="index-entry-caption pt-2.5">
-              {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden />}
-              <GridEntryTitle title={entry.title} />
+            <div className="index-entry-caption">
+              {layer && (
+                <span className="index-entry-icon">
+                  {layer.OutlineIcon && (
+                    <layer.OutlineIcon className="h-5 w-5 text-black" />
+                  )}
+                  <layer.Icon
+                    className={cn(
+                      "absolute inset-0 h-5 w-5",
+                      revealOnHoverOrActive,
+                    )}
+                  />
+                </span>
+              )}
+              <GridEntryTitle
+                title={entry.title}
+                className={revealOnHoverOrActive}
+              />
             </div>
           </button>
         );
