@@ -73,9 +73,12 @@ export const LegendFilter: FC<LegendFilterProps> = ({
 
             <span
               className={cn(
-                "absolute left-full z-20 ml-4 flex h-7 items-center whitespace-nowrap border border-white/20 bg-neutral-800/50 px-3 font-serif text-xs tracking-wider text-white backdrop-blur-sm",
+                "absolute left-full z-20 ml-4 flex h-7 items-center whitespace-nowrap px-1.5 text-base leading-none",
+                isGrid
+                  ? "bg-black text-white"
+                  : "bg-white text-black mix-blend-difference",
                 "pointer-events-none opacity-0",
-                "group-hover:[@media(hover:hover)]:pointer-events-auto group-hover:[@media(hover:hover)]:opacity-100 group-hover:[@media(hover:hover)]:bg-neutral-600/50",
+                "group-hover:[@media(hover:hover)]:pointer-events-auto group-hover:[@media(hover:hover)]:opacity-100",
                 isSelected && "pointer-events-auto opacity-100",
               )}
             >
