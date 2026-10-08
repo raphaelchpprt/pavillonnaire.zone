@@ -25,12 +25,12 @@ export const About: FC = () => {
       <p className="text-justify">
         Le suburbain est un territoire trop souvent stéréotypé. Dominée par un{' '}
         <em>urban gaze</em> a minima méprisant, l&apos;idée d&apos;une culture
-        pavillonnaire reste fragile et peine à exister. Qu&apos;est-ce que
-        cachent ces maisons que beaucoup croient toutes identiques ? Qu&apos;en
+        pavillonnaire reste fragile et peine à exister. Que cachent
+        ces maisons que beaucoup croient toutes identiques ? Qu&apos;en
         pensent leurs habitants, et quels univers y ont-ils développés ?
       </p>
       <p className="text-justify">
-        Le <span className="font-serif">pavillonnaire.zone</span> est un espace
+        <span className="font-serif">pavillonnaire.zone</span> est un espace
         contributif dont le but est de faire émerger les éléments d&apos;une
         culture pavillonnaire, en même temps qu&apos;il permet de les situer. Un
         espace virtuel et indépendant, support cliquable de cette archive
