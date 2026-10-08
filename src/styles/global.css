@@ -94,17 +94,22 @@
   }
 
   .index-header-fade {
+    --header-fade-rgb: 255 255 255;
     height: var(--index-header-fade-height);
     background: linear-gradient(
       to bottom,
-      #ffffff 0%,
-      #ffffff 28%,
-      rgb(255 255 255 / 0.92) 42%,
-      rgb(255 255 255 / 0.72) 58%,
-      rgb(255 255 255 / 0.42) 74%,
-      rgb(255 255 255 / 0.14) 88%,
-      rgb(255 255 255 / 0) 100%
+      rgb(var(--header-fade-rgb)) 0%,
+      rgb(var(--header-fade-rgb)) 28%,
+      rgb(var(--header-fade-rgb) / 0.92) 42%,
+      rgb(var(--header-fade-rgb) / 0.72) 58%,
+      rgb(var(--header-fade-rgb) / 0.42) 74%,
+      rgb(var(--header-fade-rgb) / 0.14) 88%,
+      rgb(var(--header-fade-rgb) / 0) 100%
     );
+  }
+
+  .index-header-fade--dark {
+    --header-fade-rgb: 0 0 0;
   }
 
   html.index-grid-view .site-title {
