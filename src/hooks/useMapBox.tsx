@@ -139,16 +139,29 @@ export function useMapBox(activeFilters: ActiveFilters) {
     // see https://docs.mapbox.com/help/tutorials/add-points-pt-3/ for more.
     // see https://github.com/mapbox/mapbox-react-examples/blob/master/react-tooltip/src/Map.js.
 
+    // Identifies the hovered point so moving within it only moves the tooltip
+    // instead of re-rendering the page on every mousemove.
+    let hoveredFeatureKey: string | undefined;
+
     function renderTooltip(event: mapboxgl.MapMouseEvent & mapboxgl.EventData) {
       const features = getVisibleFeatures(event.point);
 
       if (!features.length) {
         map.getCanvas().style.cursor = "inherit";
         tooltipRef.current.remove();
+        hoveredFeatureKey = undefined;
         return;
       }
 
       const feature = features[0];
+      const featureKey = `${feature.layer.id}:${
+        feature.id ?? JSON.stringify(feature.properties)
+      }`;
+      if (featureKey === hoveredFeatureKey) {
+        tooltipRef.current.setLngLat(event.lngLat);
+        return;
+      }
+      hoveredFeatureKey = featureKey;
 
       if (!isDetailsDialogOpen()) setFeature(feature);
 
