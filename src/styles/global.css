@@ -184,37 +184,6 @@
     padding-bottom: calc(
       var(--map-bottom-controls-reserve) + var(--filter-panel-fade-height)
     );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      #000 0%,
-      #000
-        calc(
-          100% - var(--map-bottom-controls-reserve) -
-            var(--filter-panel-fade-height)
-        ),
-      rgb(0 0 0 / 0.86)
-        calc(
-          100% - var(--map-bottom-controls-reserve) -
-            var(--filter-panel-fade-height) * 0.88
-        ),
-      rgb(0 0 0 / 0.58)
-        calc(
-          100% - var(--map-bottom-controls-reserve) -
-            var(--filter-panel-fade-height) * 0.74
-        ),
-      rgb(0 0 0 / 0.28)
-        calc(
-          100% - var(--map-bottom-controls-reserve) -
-            var(--filter-panel-fade-height) * 0.58
-        ),
-      rgb(0 0 0 / 0.08)
-        calc(
-          100% - var(--map-bottom-controls-reserve) -
-            var(--filter-panel-fade-height) * 0.42
-        ),
-      transparent calc(100% - var(--map-bottom-controls-reserve)),
-      transparent 100%
-    );
     mask-image: linear-gradient(
       to bottom,
       #000 0%,
@@ -283,14 +252,6 @@
       rgb(0 0 0 / 0.2) 84%,
       rgb(0 0 0 / 0) 100%
     );
-  }
-
-  .filter-panel-search-reserve {
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: var(--map-bottom-controls-reserve);
-    pointer-events: none;
   }
 }
 

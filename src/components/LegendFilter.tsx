@@ -11,14 +11,14 @@ interface LegendFilterProps {
   className?: string;
   /** map: icons negated via mix-blend-difference. grid: map-container is an
    *  isolated stacking context → blend dies, so icons render solid black. */
-  surface?: "map" | "grid";
+  surface: "map" | "grid";
 }
 
 export const LegendFilter: FC<LegendFilterProps> = ({
   selectedLayers,
   onFilterChange,
   className,
-  surface = "map",
+  surface,
 }) => {
   const isGrid = surface === "grid";
   return (
@@ -30,7 +30,7 @@ export const LegendFilter: FC<LegendFilterProps> = ({
       )}
     >
       {LAYERS_CONFIG.map((layer) => {
-        const { id, label, Icon, OutlineIcon = Icon } = layer;
+        const { id, label, Icon, OutlineIcon } = layer;
 
         const isSelected = selectedLayers.has(id);
 

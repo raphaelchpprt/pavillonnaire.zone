@@ -24,7 +24,7 @@ export interface LayerConfig {
   id: LayerType;
   label: string;
   Icon: FC<{ className?: string }>;
-  OutlineIcon?: FC<{ className?: string }>;
+  OutlineIcon: FC<{ className?: string }>;
   types: string[];
   description: ReactNode;
 }

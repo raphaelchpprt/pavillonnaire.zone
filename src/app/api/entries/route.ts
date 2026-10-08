@@ -149,7 +149,7 @@ export async function GET() {
       );
       continue;
     }
-    if (!category || !isLayerType(category)) {
+    if (!category) {
       console.error(
         `Unknown category for dataset "${id}" (${
           datasetNames?.[i] ?? "no MAPBOX_DATASET_NAMES entry"
@@ -164,9 +164,7 @@ export async function GET() {
 
   // Every dataset failed: surface a real error instead of a misleading empty
   // result, so the client can tell "load failed" from "legitimately empty".
-  const allFailed =
-    results.length > 0 && results.every((r) => r.status === "rejected");
-  if (allFailed) {
+  if (results.every((r) => r.status === "rejected")) {
     return NextResponse.json(
       { error: "Failed to fetch any dataset" },
       { status: 502 },

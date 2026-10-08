@@ -3,14 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Entry } from "@/types/entry";
 
-export type UseEntriesResult = {
-  entries: Entry[];
-  isLoading: boolean;
-  error: Error | null;
-  reload: () => void;
-};
-
-export function useEntries(): UseEntriesResult {
+export function useEntries() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -35,7 +28,6 @@ export function useEntries(): UseEntriesResult {
           if (cancelled) return;
           setEntries(data.entries);
           setIsLoading(false);
-          setError(null);
         })
         .catch((err: Error) => {
           if (cancelled) return;

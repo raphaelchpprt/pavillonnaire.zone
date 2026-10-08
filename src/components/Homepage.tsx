@@ -29,7 +29,6 @@ import {
   buildIndexCloseUrl,
 } from "@/lib/filtersUrl";
 import { Entry, FilterField, EntrySort, ViewMode } from "@/types/entry";
-import { LayerType } from "@/constants/layers";
 import { MapboxGeoJSONFeature } from "mapbox-gl";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 

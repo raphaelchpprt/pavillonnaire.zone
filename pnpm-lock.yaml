@@ -14,9 +14,6 @@ importers:
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
-      hyphen:
-        specifier: ^1.14.1
-        version: 1.14.1
       mapbox-gl:
         specifier: ^2.15.0
         version: 2.15.0
@@ -2163,9 +2160,6 @@ packages:
   http2-wrapper@1.0.3:
     resolution: {integrity: sha512-V+23sDMr12Wnz7iTcDeJr3O6AIxlnvT/bmaAAAP/Xda35C90p9599p0F1eHR/N1KILWSoWVAiOMFjBBXaXSMxg==}
     engines: {node: '>=10.19.0'}
-
-  hyphen@1.14.1:
-    resolution: {integrity: sha512-kvL8xYl5QMTh+LwohVN72ciOxC0OEV79IPdJSTwEXok9y9QHebXGdFgrED4sWfiax/ODx++CAMk3hMy4XPJPOw==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -6058,8 +6052,6 @@ snapshots:
     dependencies:
       quick-lru: 5.1.1
       resolve-alpn: 1.2.1
-
-  hyphen@1.14.1: {}
 
   ieee754@1.2.1: {}
 

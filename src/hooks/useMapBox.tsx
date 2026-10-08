@@ -55,7 +55,7 @@ function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
   return conditions.length > 0 ? ["all", ...conditions] : null;
 }
 
-export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
+export function useMapBox(activeFilters: ActiveFilters) {
   const [feature, setFeature] = useState<MapboxGeoJSONFeature | undefined>();
   const [selectedLayers, setSelectedLayers] = useState<Set<LayerType>>(
     new Set(),
@@ -186,7 +186,7 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !isMapLoaded || !isMapVisible) return;
+    if (!map || !isMapLoaded) return;
 
     let cancelled = false;
     const resize = () => {
@@ -197,7 +197,7 @@ export function useMapBox(activeFilters: ActiveFilters, isMapVisible = true) {
     return () => {
       cancelled = true;
     };
-  }, [isMapVisible, isMapLoaded]);
+  }, [isMapLoaded]);
 
   useEffect(() => {
     if (!mapRef.current || !isMapLoaded) return;

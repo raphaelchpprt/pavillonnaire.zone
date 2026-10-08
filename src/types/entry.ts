@@ -27,33 +27,14 @@ export interface Entry {
   link?: string;
 }
 
-export const AUTHOR_FIELDS = [
-  "author",
-  "director",
-  "artist",
-  "editor",
-  "album",
-] as const;
-export type AuthorField = (typeof AUTHOR_FIELDS)[number];
-
-/** Subset used for the "Auteur.ices" filter (excludes editor/album). */
-export const AUTHOR_FILTER_FIELDS = [
-  "author",
-  "director",
-  "artist",
-] as const satisfies readonly AuthorField[];
+/** Fields feeding the "Auteur.ices" filter (editor/album are excluded). */
+export const AUTHOR_FILTER_FIELDS = ["author", "director", "artist"] as const;
 
 export type FilterField = "date" | "author" | "place" | "type";
 
 export type ViewMode = "map" | "grid";
 
 export type EntrySort = "title" | "date-asc" | "date-desc";
-
-export const ENTRY_SORT_VALUES = [
-  "title",
-  "date-asc",
-  "date-desc",
-] as const satisfies readonly EntrySort[];
 
 export interface ActiveFilters {
   date: string[];

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn, formatTypeString } from "@/utils";
+import { cn } from "@/utils";
 import { formatMultiValueString } from "@/lib/normalize";
 import { ComponentProps, FC } from "react";
 
@@ -18,7 +18,7 @@ export const Tooltip: FC<TooltipProps> = ({ feature }) => {
   const { title, type, author, director, artist, album, editor, year, place } =
     feature.properties || {};
 
-  const types = formatTypeString(type);
+  const types = formatMultiValueString(type);
 
   return (
     <div id={title} className="min-w-fit max-w-sm font-body scrollbar-hide">

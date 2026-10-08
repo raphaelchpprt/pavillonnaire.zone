@@ -2,7 +2,7 @@
 
 import { MapboxGeoJSONFeature } from "mapbox-gl";
 import { ComponentProps, PropsWithChildren, FC } from "react";
-import { cn, formatTypeString } from "@/utils";
+import { cn } from "@/utils";
 import { formatMultiValueString } from "@/lib/normalize";
 import { ImageCarousel } from "./ImageCarousel";
 
@@ -52,7 +52,7 @@ export const DetailsModal: FC<DetailsModalProps> = ({ feature, onClose }) => {
     }
   }
 
-  const types = formatTypeString(type);
+  const types = formatMultiValueString(type);
 
   return (
     <aside
