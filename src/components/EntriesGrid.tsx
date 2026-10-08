@@ -54,11 +54,11 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
               {layer && (
                 <span className="index-entry-icon">
                   {layer.OutlineIcon && (
-                    <layer.OutlineIcon className="h-5 w-5 text-black" />
+                    <layer.OutlineIcon className="h-full w-full text-black" />
                   )}
                   <layer.Icon
                     className={cn(
-                      "absolute inset-0 h-5 w-5",
+                      "absolute inset-0 h-full w-full",
                       revealOnHoverOrActive,
                     )}
                   />
