@@ -4,8 +4,6 @@
 
 :root {
   --layout-rail: min(33.333vw, 264px);
-  --index-content-gutter-right: 1.5rem;
-  --index-content-gutter-left: 4.5rem;
   --index-header-fade-height: 6rem;
   --map-bottom-controls-reserve: calc(1.5rem + 28px + 0.125rem);
   --filter-panel-fade-height: 1.5rem;
@@ -17,36 +15,42 @@
   --index-entry-icon-size: calc(
     0.875rem * 1.375 + 2 * var(--index-entry-caption-spacing)
   );
-  --index-grid-columns: 2;
-  --index-grid-column: calc(
-    (
-        100vw - var(--index-content-gutter-left) -
-          var(--index-content-gutter-right) - (var(--index-grid-columns) - 1) *
-          var(--index-grid-gap)
-      ) /
-      var(--index-grid-columns)
+  --index-card-width: 178px;
+  --index-content-gutter-min: max(4.5rem, 12vw);
+  --index-content-reserve-right: 0px;
+  /* Fixed-size cards: as many columns as fit, the rest becomes side margins.
+     Centred unless that would slide under the open filter panel. */
+  --index-grid-max-columns: 5;
+  --index-grid-width: calc(
+    min(
+        round(
+          down,
+          100vw - var(--index-content-gutter-min) -
+            max(
+              var(--index-content-reserve-right),
+              var(--index-content-gutter-min)
+            ) + var(--index-grid-gap),
+          var(--index-card-width) + var(--index-grid-gap)
+        ),
+        var(--index-grid-max-columns) *
+          (var(--index-card-width) + var(--index-grid-gap))
+      ) - var(--index-grid-gap)
+  );
+  --index-content-gutter-left: min(
+    (100vw - var(--index-grid-width)) / 2,
+    100vw - var(--index-content-reserve-right) - var(--index-grid-width)
+  );
+  --index-content-gutter-right: calc(
+    100vw - var(--index-content-gutter-left) - var(--index-grid-width)
   );
   --details-panel-width: calc(
-    var(--index-content-gutter-right) + var(--index-grid-column)
+    var(--index-content-gutter-right) + var(--index-card-width)
   );
-}
-
-@media (min-width: 640px) {
-  :root {
-    --index-grid-columns: 3;
-  }
 }
 
 @media (min-width: 768px) {
-  :root {
-    --index-content-gutter-left: var(--layout-rail);
-    --index-content-gutter-right: var(--layout-rail);
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --index-grid-columns: 5;
+  html.index-grid-view:has([data-filter-open]) {
+    --index-content-reserve-right: var(--layout-rail);
   }
 }
 
@@ -63,7 +67,7 @@
   .index-grid {
     display: grid;
     align-content: start;
-    grid-template-columns: repeat(var(--index-grid-columns), minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, var(--index-card-width));
     column-gap: var(--index-grid-gap);
     row-gap: 2rem;
   }
@@ -119,7 +123,7 @@
 
   .index-entry-media {
     width: 100%;
-    height: clamp(5.5rem, 28vw, 9.5rem);
+    aspect-ratio: 25 / 18;
     border: 1.5px solid #000;
     padding: var(--index-entry-gap);
   }
@@ -130,18 +134,6 @@
     width: 100%;
     align-items: flex-end;
     justify-content: center;
-  }
-
-  @media (min-width: 640px) {
-    .index-entry-media {
-      height: clamp(6rem, 18vw, 9rem);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .index-entry-media {
-      height: clamp(5.5rem, 12vw, 8rem);
-    }
   }
 
   .index-entry-media img {
