@@ -6,7 +6,7 @@ import { FC } from 'react';
 
 export const About: FC = () => {
   return (
-    <div className="h-full overflow-auto text-white scrollbar-hide w-[min(100%,44rem)] flex flex-col gap-4 px-1">
+    <div className="text-white w-[min(100%,44rem)] flex flex-col gap-4 px-1">
       <div className="flex w-full justify-end">
         <svg
           xmlns="http://www.w3.org/2000/svg"
