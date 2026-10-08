@@ -10,6 +10,7 @@ type EntriesGridProps = {
   entries: Entry[];
   selectedEntryId?: string;
   onSelect: (entry: Entry) => void;
+  onBackgroundClick: () => void;
 };
 
 const LAYERS_BY_ID = new Map(LAYERS_CONFIG.map((l) => [l.id, l]));
@@ -18,9 +19,15 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
   entries,
   selectedEntryId,
   onSelect,
+  onBackgroundClick,
 }) => {
   return (
-    <div className="index-content-gutter index-grid-scroll index-grid h-full w-full overflow-y-auto pb-8 scrollbar-hide">
+    <div
+      className="index-content-gutter index-grid-scroll index-grid h-full w-full overflow-y-auto pb-8 scrollbar-hide"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onBackgroundClick();
+      }}
+    >
       {entries.map((entry) => {
         const isActive = entry.id === selectedEntryId;
         const layer = LAYERS_BY_ID.get(entry.category);
