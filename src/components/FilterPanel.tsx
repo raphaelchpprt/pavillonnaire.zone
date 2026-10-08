@@ -120,23 +120,14 @@ export const FilterPanel: FC<FilterPanelProps> = ({
   // reset clears both the panel filters and the sort (buildFiltersResetUrl), so
   // it reads as "active" whenever either differs from its default.
   const isResetActive = hasPanelFilters(activeFilters) || entrySort !== "title";
-  const asideRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const el = asideRef.current;
-    if (!el) return;
-    if (isOpen) {
-      el.removeAttribute("inert");
-      closeRef.current?.focus();
-    } else {
-      el.setAttribute("inert", "");
-    }
+    if (isOpen) closeRef.current?.focus();
   }, [isOpen]);
 
   return (
     <aside
-      ref={asideRef}
       aria-label="Filtres"
       data-filter-open={isOpen ? "" : undefined}
       className={cn(
@@ -296,7 +287,6 @@ export const FilterPanel: FC<FilterPanelProps> = ({
           )}
           aria-hidden
         />
-        <div className="filter-panel-search-reserve" aria-hidden />
       </div>
     </aside>
   );
