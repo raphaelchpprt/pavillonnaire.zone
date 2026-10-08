@@ -63,26 +63,15 @@ export default function Homepage() {
 
   const filteredEntries = useMemo(() => {
     const { date, author, place, type } = activeFilters;
-    const hasCategoryFilter = selectedLayers.size > 0;
-    const hasFieldFilter =
-      date.length || author.length || place.length || type.length;
-    if (!hasCategoryFilter && !hasFieldFilter) return entries;
-    return entries.filter((entry) => {
-      if (hasCategoryFilter && !selectedLayers.has(entry.category))
-        return false;
-      if (
-        date.length &&
-        (entry.year == null || !date.includes(String(entry.year)))
-      )
-        return false;
-      if (type.length && !matchesFilterSelection(entry.types, type))
-        return false;
-      if (place.length && !matchesFilterSelection(entry.places, place))
-        return false;
-      if (author.length && !matchesFilterSelection(entry.authors, author))
-        return false;
-      return true;
-    });
+    return entries.filter(
+      (entry) =>
+        (selectedLayers.size === 0 || selectedLayers.has(entry.category)) &&
+        (date.length === 0 ||
+          (entry.year != null && date.includes(String(entry.year)))) &&
+        matchesFilterSelection(entry.types, type) &&
+        matchesFilterSelection(entry.places, place) &&
+        matchesFilterSelection(entry.authors, author),
+    );
   }, [entries, activeFilters, selectedLayers]);
 
   const sortedEntries = useMemo(
@@ -94,34 +83,13 @@ export default function Homepage() {
     Entry | undefined
   >();
 
-  const gridFeature = useMemo((): MapboxGeoJSONFeature | undefined => {
-    if (!gridSelectedEntry) return undefined;
-    const e = gridSelectedEntry;
-    return {
-      type: "Feature",
-      id: e.id,
-      geometry: { type: "Point", coordinates: [0, 0] },
-      properties: {
-        title: e.title,
-        type: e.type ?? null,
-        author: e.author ?? null,
-        director: e.director ?? null,
-        artist: e.artist ?? null,
-        album: e.album ?? null,
-        editor: e.editor ?? null,
-        year: e.year ?? null,
-        place: e.place ?? null,
-        image: e.image ?? null,
-        images: e.images ? JSON.stringify(e.images) : null,
-        abstract: e.abstract ?? null,
-        link: e.link ?? null,
-      },
-      layer: {} as mapboxgl.Layer,
-      source: "",
-      sourceLayer: "",
-      state: {},
-    } as unknown as MapboxGeoJSONFeature;
-  }, [gridSelectedEntry]);
+  // DetailsModal only reads `properties`, so the entry itself stands in for a map feature.
+  const gridFeature = useMemo(
+    () =>
+      gridSelectedEntry &&
+      ({ properties: gridSelectedEntry } as unknown as MapboxGeoJSONFeature),
+    [gridSelectedEntry],
+  );
 
   const toggleFilter = (field: FilterField, value: string) => {
     const current = activeFilters[field];
@@ -285,15 +253,16 @@ export default function Homepage() {
               entries.length === 0 ? (
                 <GridStatus kind="empty" />
               ) : (
-                <GridStatus kind="empty-filtered" onReset={handleResetFilters} />
+                <GridStatus
+                  kind="empty-filtered"
+                  onReset={handleResetFilters}
+                />
               )
             ) : (
               <EntriesGrid
                 entries={sortedEntries}
                 selectedEntryId={gridSelectedEntry?.id}
-                onSelect={(entry) => {
-                  setGridSelectedEntry(entry);
-                }}
+                onSelect={setGridSelectedEntry}
               />
             )}
           </div>

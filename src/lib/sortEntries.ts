@@ -1,3 +1,4 @@
+import { compareFrench } from "@/lib/normalize";
 import { Entry, EntrySort } from "@/types/entry";
 
 /**
@@ -19,21 +20,14 @@ function compareYear(
   return direction === "asc" ? a - b : b - a;
 }
 
+const compareTitle = (a: Entry, b: Entry) => compareFrench(a.title, b.title);
+
 export function sortEntries(entries: Entry[], sort: EntrySort): Entry[] {
   const sorted = [...entries];
+  if (sort === "title") return sorted.sort(compareTitle);
 
-  switch (sort) {
-    case "title":
-      return sorted.sort((a, b) => a.title.localeCompare(b.title, "fr"));
-    case "date-asc":
-      return sorted.sort((a, b) => {
-        const byYear = compareYear(a.year, b.year, "asc");
-        return byYear !== 0 ? byYear : a.title.localeCompare(b.title, "fr");
-      });
-    case "date-desc":
-      return sorted.sort((a, b) => {
-        const byYear = compareYear(a.year, b.year, "desc");
-        return byYear !== 0 ? byYear : a.title.localeCompare(b.title, "fr");
-      });
-  }
+  const direction = sort === "date-asc" ? "asc" : "desc";
+  return sorted.sort(
+    (a, b) => compareYear(a.year, b.year, direction) || compareTitle(a, b),
+  );
 }

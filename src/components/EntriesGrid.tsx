@@ -5,7 +5,6 @@ import { Entry } from "@/types/entry";
 import { LAYERS_CONFIG } from "@/constants/layers";
 import { cn } from "@/utils";
 import { EntryThumbnail } from "@/components/EntryThumbnail";
-import { GridEntryTitle } from "@/components/GridEntryTitle";
 
 type EntriesGridProps = {
   entries: Entry[];
@@ -62,10 +61,15 @@ export const EntriesGrid: FC<EntriesGridProps> = ({
                   />
                 </span>
               )}
-              <GridEntryTitle
-                title={entry.title}
-                className={revealOnHoverOrActive}
-              />
+              <span
+                lang="fr"
+                className={cn(
+                  "index-entry-title font-serif text-sm",
+                  revealOnHoverOrActive,
+                )}
+              >
+                {entry.title}
+              </span>
             </div>
           </button>
         );

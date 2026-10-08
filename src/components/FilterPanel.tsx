@@ -3,7 +3,7 @@
 import { formatMultiValueString } from "@/lib/normalize";
 import { hasPanelFilters } from "@/lib/filtersUrl";
 import { cn } from "@/utils";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import {
   ActiveFilters,
   EntrySort,
@@ -25,11 +25,10 @@ type FilterPanelProps = {
   onEntrySortChange: (sort: EntrySort) => void;
 };
 
-const ENTRY_SORT_LABELS: Record<EntrySort, string> = {
-  title: "titres A → Z",
-  "date-desc": "date décroissante",
-  "date-asc": "date croissante",
-};
+const VIEW_BUTTONS: { view: ViewMode; label: string }[] = [
+  { view: "map", label: "Carte" },
+  { view: "grid", label: "Catalogue" },
+];
 
 const SortAlphabetIcon: FC<{ className?: string }> = ({ className }) => (
   <span
@@ -59,12 +58,9 @@ const dropdownAlignBlock =
 
 const panelControlCell = "flex h-7 items-center justify-center";
 
-const panelButtonBorder = "border-[1.5px] border-current";
-
 const panelCloseButtonClass = (isGridView: boolean) =>
   cn(
-    "grid h-7 w-7 shrink-0 cursor-pointer place-items-center transition-colors",
-    panelButtonBorder,
+    "grid h-7 w-7 shrink-0 cursor-pointer place-items-center border-[1.5px] transition-colors",
     isGridView
       ? "border-black text-black hover:bg-black hover:text-white"
       : "border-white text-white hover:bg-white hover:text-black",
@@ -82,11 +78,6 @@ const panelToggleButtonClass = (isActive: boolean, isGridView: boolean) =>
         : "border-white text-white hover:bg-white hover:text-black",
   );
 
-const panelSortButtonClass = (isActive: boolean, isGridView: boolean) =>
-  cn(
-    panelToggleButtonClass(isActive, isGridView),
-    "text-base leading-none px-1.5 py-0.5",
-  );
 
 const filterValueClass = (isActive: boolean, isGridView: boolean) =>
   cn(
@@ -126,6 +117,22 @@ export const FilterPanel: FC<FilterPanelProps> = ({
     if (isOpen) closeRef.current?.focus();
   }, [isOpen]);
 
+  const sortButtons: { sort: EntrySort; content: ReactNode; label?: string }[] =
+    [
+      {
+        sort: "title",
+        label: "titres A → Z",
+        content: (
+          <span className="inline-flex items-center gap-1.5">
+            trier
+            <SortAlphabetIcon />
+          </span>
+        ),
+      },
+      { sort: "date-desc", content: "date ↓" },
+      { sort: "date-asc", content: "date ↑" },
+    ];
+
   return (
     <aside
       aria-label="Filtres"
@@ -153,31 +160,26 @@ export const FilterPanel: FC<FilterPanelProps> = ({
                 role="group"
                 aria-label="Vue"
               >
-                <button
-                  type="button"
-                  onClick={() => onViewChange("map")}
-                  aria-pressed={currentView === "map"}
-                  className={cn(
-                    panelToggleButtonClass(currentView === "map", isGridView),
-                    "flex h-7 items-center",
-                  )}
-                >
-                  Carte
-                </button>
-                <span aria-hidden="true" className="select-none">
-                  {"↔︎"}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => onViewChange("grid")}
-                  aria-pressed={currentView === "grid"}
-                  className={cn(
-                    panelToggleButtonClass(currentView === "grid", isGridView),
-                    "flex h-7 items-center",
-                  )}
-                >
-                  Catalogue
-                </button>
+                {VIEW_BUTTONS.map(({ view, label }, index) => (
+                  <Fragment key={view}>
+                    {index > 0 && (
+                      <span aria-hidden="true" className="select-none">
+                        {"↔︎"}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onViewChange(view)}
+                      aria-pressed={currentView === view}
+                      className={cn(
+                        panelToggleButtonClass(currentView === view, isGridView),
+                        "flex h-7 items-center",
+                      )}
+                    >
+                      {label}
+                    </button>
+                  </Fragment>
+                ))}
               </div>
               <button
                 ref={closeRef}
@@ -201,43 +203,21 @@ export const FilterPanel: FC<FilterPanelProps> = ({
               role="group"
               aria-label="Tri et réinitialisation"
             >
-              <button
-                type="button"
-                onClick={() => onEntrySortChange("title")}
-                aria-pressed={entrySort === "title"}
-                aria-label={ENTRY_SORT_LABELS.title}
-                className={cn(
-                  panelSortButtonClass(entrySort === "title", isGridView),
-                  "flex-1",
-                )}
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  trier
-                  <SortAlphabetIcon />
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onEntrySortChange("date-desc")}
-                aria-pressed={entrySort === "date-desc"}
-                className={cn(
-                  panelSortButtonClass(entrySort === "date-desc", isGridView),
-                  "flex-1",
-                )}
-              >
-                date ↓
-              </button>
-              <button
-                type="button"
-                onClick={() => onEntrySortChange("date-asc")}
-                aria-pressed={entrySort === "date-asc"}
-                className={cn(
-                  panelSortButtonClass(entrySort === "date-asc", isGridView),
-                  "flex-1",
-                )}
-              >
-                date ↑
-              </button>
+              {sortButtons.map(({ sort, content, label }) => (
+                <button
+                  key={sort}
+                  type="button"
+                  onClick={() => onEntrySortChange(sort)}
+                  aria-pressed={entrySort === sort}
+                  aria-label={label}
+                  className={cn(
+                    panelToggleButtonClass(entrySort === sort, isGridView),
+                    "flex-1 text-base leading-none",
+                  )}
+                >
+                  {content}
+                </button>
+              ))}
             </div>
           )}
           <div

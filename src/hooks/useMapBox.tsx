@@ -43,13 +43,12 @@ function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
   if (placeFilter) conditions.push(placeFilter);
 
   if (activeFilters.author.length > 0) {
-    const authorFilters = AUTHOR_FILTER_FIELDS.flatMap((f) => {
-      const filter = buildMapboxMultiValueFilter(f, activeFilters.author);
-      return filter ? [filter] : [];
-    });
-    if (authorFilters.length > 0) {
-      conditions.push(["any", ...authorFilters]);
-    }
+    conditions.push([
+      "any",
+      ...AUTHOR_FILTER_FIELDS.map((f) =>
+        buildMapboxMultiValueFilter(f, activeFilters.author),
+      ),
+    ]);
   }
 
   return conditions.length > 0 ? ["all", ...conditions] : null;

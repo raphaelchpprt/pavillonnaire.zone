@@ -82,7 +82,7 @@ export const EntryThumbnail: FC<EntryThumbnailProps> = ({ entry, alt }) => {
       width={640}
       height={480}
       sizes="(max-width: 1023px) 28vw, (max-width: 1279px) 18vw, 12vw"
-      className={cn("block h-full max-w-full", fitWidth ? "fit-width" : "w-auto")}
+      className={cn("block h-full max-w-full", fitWidth ? "w-full" : "w-auto")}
       onLoadingComplete={handleLoadingComplete}
       onError={() => {
         setUrlIndex((i) => {
