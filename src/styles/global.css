@@ -22,7 +22,7 @@
   --index-grid-max-columns: 5;
   --index-content-gutter-min: max(4.5rem, 12vw);
   --index-content-reserve-right: 0px;
-  /* Centred grid with equal side margins, each at least as wide as the open
+  /* Centred grid with equal side margins, each at least as wide as the
      filter panel. Cards stay at max width when there is room and shrink
      (proportions kept) down to min width before a column is dropped. */
   --index-grid-available: calc(
@@ -63,10 +63,11 @@
   );
 }
 
-/* Keyed on the grid's own markup rather than html.index-grid-view, which an
-   effect adds after the first paint: the loading state would shift left. */
+/* The grid always leaves room for the filter panel, so opening or closing it
+   never resizes the cards. Keyed on the grid's own markup rather than
+   html.index-grid-view, which an effect adds after the first paint. */
 @media (min-width: 768px) {
-  html:has(.index-content-gutter):has([data-filter-open]) {
+  html:has(.index-content-gutter) {
     --index-content-reserve-right: var(--layout-rail);
   }
 }
