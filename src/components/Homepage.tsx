@@ -91,6 +91,11 @@ export default function Homepage() {
     [gridSelectedEntry],
   );
 
+  const closeGridDetails = () => {
+    document.getElementById("details-dialog")?.classList.add("hidden");
+    setGridSelectedEntry(undefined);
+  };
+
   const toggleFilter = (field: FilterField, value: string) => {
     const current = activeFilters[field];
     const next = current.includes(value)
@@ -263,6 +268,7 @@ export default function Homepage() {
                 entries={sortedEntries}
                 selectedEntryId={gridSelectedEntry?.id}
                 onSelect={setGridSelectedEntry}
+                onBackgroundClick={closeGridDetails}
               />
             )}
           </div>
