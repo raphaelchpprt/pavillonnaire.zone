@@ -54,6 +54,19 @@ function buildLayerFilter(activeFilters: ActiveFilters): unknown[] | null {
   return conditions.length > 0 ? ["all", ...conditions] : null;
 }
 
+function applyLayerVisibility(map: mapboxgl.Map, selection: Set<LayerType>) {
+  const effectiveLayers = getEffectiveVisibleLayers(selection);
+  LAYER_IDS.forEach((id) => {
+    if (map.getLayer(id)) {
+      map.setLayoutProperty(
+        id,
+        "visibility",
+        effectiveLayers.has(id) ? "visible" : "none",
+      );
+    }
+  });
+}
+
 export function useMapBox(activeFilters: ActiveFilters) {
   const [feature, setFeature] = useState<MapboxGeoJSONFeature | undefined>();
   const [selectedLayers, setSelectedLayers] = useState<Set<LayerType>>(
@@ -199,6 +212,12 @@ export function useMapBox(activeFilters: ActiveFilters) {
   }, [isMapLoaded]);
 
   useEffect(() => {
+    if (mapRef.current && isMapLoaded) {
+      applyLayerVisibility(mapRef.current, selectedLayersRef.current);
+    }
+  }, [isMapLoaded]);
+
+  useEffect(() => {
     if (!mapRef.current || !isMapLoaded) return;
 
     const filterKey = JSON.stringify(activeFilters);
@@ -224,19 +243,7 @@ export function useMapBox(activeFilters: ActiveFilters) {
       }
 
       selectedLayersRef.current = newSet;
-
-      const effectiveLayers = getEffectiveVisibleLayers(newSet);
-
-      LAYER_IDS.forEach((id) => {
-        if (mapRef.current?.getLayer(id)) {
-          const isVisible = effectiveLayers.has(id as LayerType);
-          mapRef.current.setLayoutProperty(
-            id,
-            "visibility",
-            isVisible ? "visible" : "none",
-          );
-        }
-      });
+      if (mapRef.current) applyLayerVisibility(mapRef.current, newSet);
 
       return newSet;
     });
@@ -246,12 +253,7 @@ export function useMapBox(activeFilters: ActiveFilters) {
     const empty = new Set<LayerType>();
     selectedLayersRef.current = empty;
     setSelectedLayers(empty);
-
-    LAYER_IDS.forEach((id) => {
-      if (mapRef.current?.getLayer(id)) {
-        mapRef.current.setLayoutProperty(id, "visibility", "visible");
-      }
-    });
+    if (mapRef.current) applyLayerVisibility(mapRef.current, empty);
   };
 
   return {
