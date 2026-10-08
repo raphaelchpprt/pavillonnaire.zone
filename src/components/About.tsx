@@ -23,36 +23,39 @@ export const About: FC = () => {
         </svg>
       </div>
       <p className="text-justify">
-        Le pavillonnaire est un territoire dont on connaît trop peu la culture.
-        Nous sommes beaucoup à y avoir grandi ou vécu, et pourtant l&apos;idée
-        d&apos;une culture pavillonnaire reste encore discrète et fragile. Que
-        se cache-t-il derrière ces maisons que beaucoup croient toutes
-        identiques ? Qu&apos;en pensent leurs habitants, et quel univers y
-        ont-ils développé ?
+        Le suburbain est un territoire trop souvent stéréotypé. Dominée par un{' '}
+        <em>urban gaze</em> a minima méprisant, l&apos;idée d&apos;une culture
+        pavillonnaire reste fragile et peine à exister. Qu&apos;est-ce que
+        cachent ces maisons que beaucoup croient toutes identiques ? Qu&apos;en
+        pensent leurs habitants, et quels univers y ont-ils développés ?
       </p>
       <p className="text-justify">
         Le <span className="font-serif">pavillonnaire.zone</span> est un espace
         contributif dont le but est de faire émerger les éléments d&apos;une
-        culture pavillonnaire, en même temps qu&apos;il permet de les situer. Le
-        <span className="font-serif">.zone</span> est le support cliquable à
-        cette archive géolocalisée.
+        culture pavillonnaire, en même temps qu&apos;il permet de les situer. Un
+        espace virtuel et indépendant, support cliquable de cette archive
+        géolocalisée.
       </p>
       <p className="text-justify">
-        La map donne à voir, sans ambiguïté, et pour la première fois, la
+        La map donne à voir, sans ambiguïté et pour la première fois, la
         silhouette du pavillonnaire sur le territoire français. Pixels noirs
         éparpillés entre campagnes et centres-villes, la trace est issue
         d&apos;un traitement des{' '}
         <a
           className="underline"
           href="https://www.insee.fr/fr/statistiques/2520034"
+          target="_blank"
+          rel="noreferrer"
         >
           données carroyées
         </a>{' '}
-        de l&apos;INSEE. Chaque pixel correspond à un carreau de 200/200 mètres,
-        estimé à{' '}
+        de l&apos;INSEE. Chaque pixel correspond à un carreau de 200 × 200
+        mètres, estimé à{' '}
         <a
           className="underline"
           href="http://www.donnees.normandie.developpement-durable.gouv.fr/pavillonnaire/details.html"
+          target="_blank"
+          rel="noreferrer"
         >
           dominante pavillonnaire
         </a>
@@ -62,15 +65,15 @@ export const About: FC = () => {
         L&apos;archive explore l&apos;idée d&apos;une culture pavillonnaire, au
         travers des travaux ou des expériences qui en émanent. Elle rassemble un
         imaginaire en constellation, sans souci de hiérarchie entre les
-        différents items qui la composent. Une sélection contributive, à prendre
-        comme une enquête pour l&apos;épanouissement d&apos;une culture
-        discrète, vécue de l&apos;intérieur.
+        différents items qui la composent. Un catalogue contributif, à prendre
+        comme enquête par accumulation, pour l&apos;épanouissement d&apos;un{' '}
+        <em>suburban gaze</em>.
       </p>
 
       <p className="text-justify">
-        Chaque item ajouté à la map correspond à un des 6 univers qui cadrillent
-        cet espace. Ils sont signalés par un des pavillons couleur rose enduit
-        et nous guident à la navigation dans la zone :
+        Chaque item ajouté à la map correspond à l&apos;un des 6 univers qui
+        quadrillent cet espace. Ils sont signalés par un des pavillons couleur
+        rose enduit et nous guident à la navigation dans la zone :
       </p>
 
       <Flags />
@@ -78,14 +81,24 @@ export const About: FC = () => {
       <p>Pavillonnairement,</p>
 
       <p>
-        <a className="underline" href="https://www.instagram.com/sabrimyllaud/">
+        <a
+          className="underline"
+          href="https://www.instagram.com/sabrimyllaud/"
+          target="_blank"
+          rel="noreferrer"
+        >
           Samy
         </a>
         ,{' '}
-        <a className="underline" href="https://twitter.com/williamhzo">
+        <a
+          className="underline"
+          href="https://twitter.com/williamhzo"
+          target="_blank"
+          rel="noreferrer"
+        >
           William
-        </a>
-        ,{' '}
+        </a>{' '}
+        et{' '}
         <a
           className="underline"
           href="https://www.linkedin.com/in/raphaelchappert/"
@@ -94,11 +107,44 @@ export const About: FC = () => {
         >
           Raphaël
         </a>
-        , et la participation de{' '}
-        <a className="underline" href="https://www.instagram.com/traast_agram/">
-          Victor
+        , qui ont eux-mêmes grandi dans la zone.
+      </p>
+
+      <p className="text-justify">
+        P.-S. : on vous invite à aller voir du côté du blog{' '}
+        <a
+          className="underline"
+          href="https://lotxlotxlot.com/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          LOT
         </a>{' '}
-        qui ont eux même grandi dans la zone.
+        et de ses contributeur.ices, avec lesquels{' '}
+        <span className="font-serif">pavillonnaire.zone</span> entretient des
+        liens de plus en plus étroits.
+      </p>
+
+      <p>
+        Fontes utilisées :{' '}
+        <a
+          className="underline"
+          href="https://www.redaction.us/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Redaction
+        </a>{' '}
+        par Forest Young et Jeremy Mickel +{' '}
+        <a
+          className="underline"
+          href="https://www.zone38.net/font/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Yoster Island
+        </a>{' '}
+        par codeman38.
       </p>
 
       <div className="my-8">
