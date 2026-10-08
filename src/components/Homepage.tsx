@@ -209,6 +209,10 @@ export default function Homepage() {
 
       {isAboutOpen && (
         <>
+          <div
+            className="index-header-fade index-header-fade--dark pointer-events-none fixed inset-x-0 top-0 z-[15]"
+            aria-hidden
+          />
           <div className="flex h-full w-full items-start justify-center overflow-auto p-6 py-20 scrollbar-hide md:p-20">
             <About />
           </div>
