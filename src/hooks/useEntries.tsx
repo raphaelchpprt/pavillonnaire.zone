@@ -19,7 +19,7 @@ export function useEntries() {
     setError(null);
 
     const load = (attempt = 0) => {
-      fetch("/api/entries", { cache: "no-store" })
+      fetch("/api/entries")
         .then((r) => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r.json();
