@@ -1,6 +1,9 @@
-export const MULTI_VALUE_DELIMITER = " ; ";
+const MULTI_VALUE_DELIMITER = " ; ";
 
 const LOCALE = "fr-FR";
+
+/** Shared French collator: faster than calling `localeCompare(…, "fr")` per comparison. */
+export const compareFrench = new Intl.Collator("fr").compare;
 
 export function normalizeToken(value: string): string {
   return value.trim().replace(/\s+/g, " ");
@@ -23,26 +26,13 @@ export function formatMultiValueString(raw?: string): string {
   return parts.map(formatFacetDisplayLabel).join(", ");
 }
 
-function splitMultiValueParts(raw: string): string[] {
-  return raw.split(/\s*;\s*/);
-}
-
 /**
  * Split a multi-value field (` ; ` or `;` separator) into normalized tokens,
  * deduplicated canonically (the first spelling is kept).
  * @example parseMultiValue("Roman ; roman ; essai") // → ["Roman", "essai"]
  */
 export function parseMultiValue(raw?: string): string[] {
-  if (!raw) return [];
-
-  const seen = new Map<string, string>();
-  for (const part of splitMultiValueParts(raw)) {
-    const token = normalizeToken(part);
-    if (!token) continue;
-    const key = canonicalKey(token);
-    if (!seen.has(key)) seen.set(key, token);
-  }
-  return Array.from(seen.values());
+  return raw ? dedupeTokens(raw.split(/\s*;\s*/)) : [];
 }
 
 export function dedupeTokens(tokens: string[]): string[] {

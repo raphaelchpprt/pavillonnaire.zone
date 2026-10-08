@@ -12,6 +12,11 @@ type ReadableSearchParams = Pick<
   "get" | "getAll" | "toString"
 >;
 
+function toUrl(params: URLSearchParams): string {
+  const qs = params.toString();
+  return qs ? `/?${qs}` : "/";
+}
+
 export function parseFiltersFromUrl(
   searchParams: ReadableSearchParams,
 ): ActiveFilters {
@@ -48,8 +53,7 @@ export function buildSortUrl(
   } else {
     params.set("sort", sort);
   }
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  return toUrl(params);
 }
 
 export function buildFiltersResetUrl(
@@ -60,8 +64,7 @@ export function buildFiltersResetUrl(
     params.delete(field);
   }
   params.delete("sort");
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  return toUrl(params);
 }
 
 export function buildFilterUrl(
@@ -75,8 +78,7 @@ export function buildFilterUrl(
       params.append(field, value);
     }
   }
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  return toUrl(params);
 }
 
 export function buildViewUrl(
@@ -89,8 +91,7 @@ export function buildViewUrl(
   } else {
     params.delete("view");
   }
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  return toUrl(params);
 }
 
 export function buildIndexOpenUrl(
@@ -98,8 +99,7 @@ export function buildIndexOpenUrl(
 ): string {
   const params = new URLSearchParams(existingParams.toString());
   params.set("index", "open");
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  return toUrl(params);
 }
 
 export function buildIndexCloseUrl(
@@ -107,6 +107,5 @@ export function buildIndexCloseUrl(
 ): string {
   const params = new URLSearchParams(existingParams.toString());
   params.delete("index");
-  const qs = params.toString();
-  return qs ? `/?${qs}` : "/";
+  return toUrl(params);
 }

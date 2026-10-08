@@ -105,22 +105,6 @@
     );
   }
 
-  .details-panel-width {
-    width: 100%;
-  }
-
-  @media (min-width: 640px) {
-    .details-panel-width {
-      width: max(25%, 350px);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .details-panel-width {
-      width: var(--details-panel-width);
-    }
-  }
-
   .index-entry-media {
     width: 100%;
     aspect-ratio: 25 / 18;
@@ -137,16 +121,7 @@
   }
 
   .index-entry-media img {
-    height: 100%;
-    width: auto;
-    max-width: 100%;
     object-fit: cover;
-    object-position: center;
-  }
-
-  /* Residual side-gap: fill the full cell width (see FIT_WIDTH_THRESHOLD_PX). */
-  .index-entry-media img.fit-width {
-    width: 100%;
   }
 
   .index-entry-caption {
