@@ -15,34 +15,49 @@
   --index-entry-icon-size: calc(
     0.875rem * 1.375 + 2 * var(--index-entry-caption-spacing)
   );
-  --index-card-width: 178px;
+  --index-card-max-width: 177.6px;
+  /* (max + gap) / (min + gap) must stay under 1.2, or auto-fill below could
+     fit a sixth column where 5 max-width cards are laid out. */
+  --index-card-min-width: 150px;
+  --index-grid-max-columns: 5;
   --index-content-gutter-min: max(4.5rem, 12vw);
   --index-content-reserve-right: 0px;
-  /* Fixed-size cards: as many columns as fit, the rest becomes side margins.
-     Centred unless that would slide under the open filter panel. */
-  --index-grid-max-columns: 5;
-  --index-grid-width: calc(
-    min(
+  /* Centred grid with equal side margins, each at least as wide as the open
+     filter panel. Cards stay at max width when there is room and shrink
+     (proportions kept) down to min width before a column is dropped. */
+  --index-grid-available: calc(
+    100vw - 2 *
+      max(var(--index-content-gutter-min), var(--index-content-reserve-right))
+  );
+  /* tan(atan2(a, b)) = a / b: CSS cannot divide one length by another. */
+  --index-grid-columns: clamp(
+    1,
+    tan(
+      atan2(
         round(
           down,
-          100vw - var(--index-content-gutter-min) -
-            max(
-              var(--index-content-reserve-right),
-              var(--index-content-gutter-min)
-            ) + var(--index-grid-gap),
-          var(--index-card-width) + var(--index-grid-gap)
+          var(--index-grid-available) + var(--index-grid-gap),
+          var(--index-card-min-width) + var(--index-grid-gap)
         ),
-        var(--index-grid-max-columns) *
-          (var(--index-card-width) + var(--index-grid-gap))
-      ) - var(--index-grid-gap)
+        var(--index-card-min-width) + var(--index-grid-gap)
+      )
+    ),
+    var(--index-grid-max-columns)
   );
-  --index-content-gutter-left: min(
-    (100vw - var(--index-grid-width)) / 2,
-    100vw - var(--index-content-reserve-right) - var(--index-grid-width)
+  --index-card-width: min(
+    var(--index-card-max-width),
+    (
+        var(--index-grid-available) - (var(--index-grid-columns) - 1) *
+          var(--index-grid-gap)
+      ) /
+      var(--index-grid-columns)
   );
-  --index-content-gutter-right: calc(
-    100vw - var(--index-content-gutter-left) - var(--index-grid-width)
+  --index-grid-width: calc(
+    var(--index-grid-columns) * var(--index-card-width) +
+      (var(--index-grid-columns) - 1) * var(--index-grid-gap)
   );
+  --index-content-gutter-left: calc((100vw - var(--index-grid-width)) / 2);
+  --index-content-gutter-right: var(--index-content-gutter-left);
   --details-panel-width: calc(
     var(--index-content-gutter-right) + var(--index-card-width)
   );
@@ -67,7 +82,10 @@
   .index-grid {
     display: grid;
     align-content: start;
-    grid-template-columns: repeat(auto-fill, var(--index-card-width));
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--index-card-min-width), 1fr)
+    );
     column-gap: var(--index-grid-gap);
     row-gap: 2rem;
   }
