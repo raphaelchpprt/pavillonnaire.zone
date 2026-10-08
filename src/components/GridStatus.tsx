@@ -15,7 +15,7 @@ const ACTION_CLASS =
  *  black-and-white brutalist register with the single rose accent. */
 export const GridStatus: FC<GridStatusProps> = (props) => {
   return (
-    <div className="index-content-gutter index-grid-scroll flex h-full w-full flex-col items-center justify-center gap-4 pb-8 text-center">
+    <div className="index-content-gutter index-grid-scroll flex h-full w-full flex-col items-center justify-center gap-4 pb-[var(--index-header-fade-height)] text-center">
       {props.kind === "loading" && (
         <div role="status" aria-label="Chargement de l’index">
           {/* eslint-disable-next-line @next/next/no-img-element */}

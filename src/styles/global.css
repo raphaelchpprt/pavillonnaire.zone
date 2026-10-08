@@ -63,8 +63,10 @@
   );
 }
 
+/* Keyed on the grid's own markup rather than html.index-grid-view, which an
+   effect adds after the first paint: the loading state would shift left. */
 @media (min-width: 768px) {
-  html.index-grid-view:has([data-filter-open]) {
+  html:has(.index-content-gutter):has([data-filter-open]) {
     --index-content-reserve-right: var(--layout-rail);
   }
 }
