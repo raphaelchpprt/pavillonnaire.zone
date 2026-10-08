@@ -209,7 +209,7 @@ export default function Homepage() {
 
       {isAboutOpen && (
         <>
-          <div className="flex h-full w-full items-start justify-center p-6 py-20 md:p-20">
+          <div className="flex h-full w-full items-start justify-center overflow-auto p-6 py-20 scrollbar-hide md:p-20">
             <About />
           </div>
           <Instagram />
